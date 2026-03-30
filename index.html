@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>KURDISH · KARWAN · iFILM | Dra & sortera · Dubbelklicka</title>
+  <title>KURDISH · KARWAN · iFILM | Dra & sortera · JS AV fungerar</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -130,7 +130,7 @@
 </div>
 
 <script>
-  // ========== Kanaldata: Kurdiska (HLS/iframe) + Karwan (iframe) + iFilm (HLS) ==========
+  // ========== Kanaldata ==========
   const kurdishRaw = [
     { name: 'Zagros',           url: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8',                         color: 'green' },
     { name: 'MMN News',         url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8',                                           color: 'green' },
@@ -261,7 +261,6 @@
     { name: 'Ava TV',             url: 'https://karwan.tv/ava-tv',                method: 'iframe', color: 'beige',   subgroup: 'beige' },
   ];
 
-  // iFilm med stabila Presstv-länkar (fungerar utan extra rubriker)
   const ifilmRaw = [
     { name: 'iFilm Farsi',   url: 'https://live.presstv.ir/hls/ifilmfa.m3u8',                       color: 'blue' },
     { name: 'iFilm Dari',    url: 'https://live.presstv.ir/hls/ifilm2.m3u8',                        color: 'blue' },
@@ -439,6 +438,15 @@
     document.getElementById('ch-title').textContent = name;
     if (hlsInst) { hlsInst.destroy(); hlsInst = null; }
     const wrap = document.getElementById('vwrap');
+
+    // Specialhantering för JS AV: Karwan-kanaler (iframe) öppnas i ny flik istället
+    if (!jsEnabled && method === 'iframe') {
+      window.open(url, '_blank');
+      wrap.innerHTML = `<div class="error-msg"><h3>🔗 Öppnade i ny flik</h3><p>${name} öppnades i en ny flik eftersom JavaScript är avstängt.</p></div>`;
+      render(curFilter, curSub);
+      return;
+    }
+
     wrap.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%;"><div class="spinner"></div><span style="margin-left:12px;">Laddar ${name}...</span></div>`;
 
     setTimeout(() => {
@@ -449,6 +457,17 @@
         return;
       }
 
+      if (!jsEnabled) {
+        // JS av – använd enkel video
+        wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
+        const vid = document.getElementById('vplayer');
+        vid.src = url;
+        vid.play().catch(e => { wrap.innerHTML = `<div class="error-msg"><h3>⚠️ JS AV: Kunde inte spela</h3><p>${url.substring(0,70)}</p><button class="btn" onclick="reload()">↻ Försök igen</button></div>`; });
+        render(curFilter, curSub);
+        return;
+      }
+
+      // Normal HLS
       wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
       const vid = document.getElementById('vplayer');
       if (Hls.isSupported()) {
@@ -461,7 +480,6 @@
             const ua = document.getElementById('ua-select').value;
             if (ua) try { xhr.setRequestHeader('User-Agent', ua); } catch(e){}
             if (referer) try { xhr.setRequestHeader('Referer', referer); } catch(e){}
-            // För presstv-länkarna (ifilm) fungerar utan extra rubriker
           }
         });
         hlsInst.loadSource(url);
