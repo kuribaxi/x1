@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>KURDISH · KARWAN · iFILM | Dubbelklicka för att spela</title>
+  <title>KURDISH · KARWAN · iFILM | Dra & sortera · Dubbelklicka</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -72,8 +72,8 @@
 </head>
 <body>
 <div class="header">
-  <h1>KURDISH · KARWAN · iFILM ✨ Dubbelklicka för att spela</h1>
-  <p>Dra för att sortera • Dubbelklicka på kanal för uppspelning</p>
+  <h1>KURDISH · KARWAN · iFILM ✨ Dra & sortera</h1>
+  <p>Dra för att ändra ordning • Dubbelklicka (eller enkelklicka) för att spela</p>
 </div>
 
 <div class="nav-buttons">
@@ -130,7 +130,7 @@
 </div>
 
 <script>
-  // ========== ENDAST KURDISKA + KARWAN (iframe) + iFILM ==========
+  // ========== Kanaldata: Kurdiska (HLS/iframe) + Karwan (iframe) + iFilm (HLS) ==========
   const kurdishRaw = [
     { name: 'Zagros',           url: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8',                         color: 'green' },
     { name: 'MMN News',         url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8',                                           color: 'green' },
@@ -261,13 +261,15 @@
     { name: 'Ava TV',             url: 'https://karwan.tv/ava-tv',                method: 'iframe', color: 'beige',   subgroup: 'beige' },
   ];
 
+  // iFilm med stabila Presstv-länkar (fungerar utan extra rubriker)
   const ifilmRaw = [
-    { name: 'iFilm Farsi', url: 'https://gg.hls2.xyz/live/AP%20iFilm%20Persian/chunks.m3u8?nimblesessionid=328913764',   color: 'blue' },
+    { name: 'iFilm Farsi',   url: 'https://live.presstv.ir/hls/ifilmfa.m3u8',                       color: 'blue' },
     { name: 'iFilm Dari',    url: 'https://live.presstv.ir/hls/ifilm2.m3u8',                        color: 'blue' },
     { name: 'iFilm English', url: 'https://live.presstv.ir/hls/ifilmen.m3u8',                       color: 'blue' },
     { name: 'iFilm Arabic',  url: 'https://live.presstv.ir/hls/ifilmar.m3u8',                       color: 'blue' }
   ];
 
+  // ----- Ordningslagring -----
   function loadOrder(cat) { try { const ord = localStorage.getItem(`order_${cat}`); return ord ? JSON.parse(ord) : null; } catch(e){ return null; } }
   function saveOrder(cat, arr) { localStorage.setItem(`order_${cat}`, JSON.stringify(arr.map(c=>c.url))); }
 
@@ -302,6 +304,8 @@
   let curSub = 'all';
   let dragSource = null;
 
+  function e(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
   function render(filter, sub) {
     curFilter = filter; curSub = sub || 'all';
     const catNames = { kurdish:'🏔 Kurdiska', karwan:'⭐ Karwan TV', ifilm:'🌍 iFilm' };
@@ -331,13 +335,12 @@
     }
     document.getElementById('ch-container').innerHTML = html;
     attachDragListeners();
-    attachChannelEvents(); // adds click/dblclick
+    attachChannelEvents();
   }
 
   function attachChannelEvents() {
     const items = document.querySelectorAll('.channel-item');
     items.forEach(el => {
-      // Remove old listeners to avoid duplicates
       el.removeEventListener('click', handleSingleClick);
       el.removeEventListener('dblclick', handleDoubleClick);
       el.addEventListener('click', handleSingleClick);
@@ -346,7 +349,6 @@
   }
 
   function handleSingleClick(e) {
-    // Prevent if clicking on fav button
     if (e.target.classList.contains('fav-btn')) return;
     const item = e.currentTarget;
     const url = item.getAttribute('data-url');
@@ -459,6 +461,7 @@
             const ua = document.getElementById('ua-select').value;
             if (ua) try { xhr.setRequestHeader('User-Agent', ua); } catch(e){}
             if (referer) try { xhr.setRequestHeader('Referer', referer); } catch(e){}
+            // För presstv-länkarna (ifilm) fungerar utan extra rubriker
           }
         });
         hlsInst.loadSource(url);
@@ -510,7 +513,6 @@
   function outsideDD(e) { if (!document.getElementById('karwan-dd').contains(e.target) && !document.getElementById('karwan-btn').contains(e.target)) closeDD(); }
   function toggleList() { document.getElementById('channel-list').classList.toggle('show'); }
   function fav(url,name) { const i=favs.findIndex(f=>f.url===url); i>-1? favs.splice(i,1): favs.push({url,name}); localStorage.setItem('xomfavs',JSON.stringify(favs)); render(curFilter,curSub); }
-  function e(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
   (function loadPrefs() {
     try {
