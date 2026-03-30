@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>KURDISH · KARWAN · iFILM | Dra för att sortera</title>
+  <title>KURDISH · KARWAN · iFILM | Dubbelklicka för att spela</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -72,8 +72,8 @@
 </head>
 <body>
 <div class="header">
-  <h1>KURDISH · KARWAN · iFILM ✨ Dra & sortera</h1>
-  <p>Kurdiska, Karwan & iFilm kanaler • Håll musen över och dra för att ändra ordning</p>
+  <h1>KURDISH · KARWAN · iFILM ✨ Dubbelklicka för att spela</h1>
+  <p>Dra för att sortera • Dubbelklicka på kanal för uppspelning</p>
 </div>
 
 <div class="nav-buttons">
@@ -104,7 +104,7 @@
   <main class="video-container">
     <div class="video-header">
       <div>
-        <div class="video-title" id="ch-title">📡 Välj kanal</div>
+        <div class="video-title" id="ch-title">📡 Dubbelklicka på kanal</div>
         <div class="ua-selector">UA:
           <select id="ua-select" onchange="if(cur) reload()">
             <option value="">Auto (standard)</option>
@@ -124,14 +124,13 @@
       </div>
     </div>
     <div class="video-wrapper" id="vwrap">
-      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px; margin-top:12px;">✨ Dra i kanalerna för att ändra ordning (håll musen över och dra)</p></div>
+      <div class="error-msg"><h3>👈 Dubbelklicka på en kanal</h3><p style="font-size:13px; margin-top:12px;">✨ Dra för att ändra ordning, dubbelklicka för att spela</p></div>
     </div>
   </main>
 </div>
 
 <script>
-  // ========== ENDAST KURDISKA + KARWAN (nu iframe) + iFILM ==========
-  // --- Kurdiska (oförändrade, många HLS) ---
+  // ========== ENDAST KURDISKA + KARWAN (iframe) + iFILM ==========
   const kurdishRaw = [
     { name: 'Zagros',           url: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8',                         color: 'green' },
     { name: 'MMN News',         url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8',                                           color: 'green' },
@@ -178,7 +177,7 @@
     { name: 'MMN Sport',         url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8',                                           color: 'green' },
     { name: 'Amozhgary',         url: 'https://app-live.org/live/3268334b/index.m3u8',                                                color: 'green' },
     { name: 'Payam TV',         url: 'https://media2.streambrothers.com:1936/8218/8218/chunklist_w1239498607.m3u8',                             color: 'green' },
-    { name: 'Speda',         url: 'https://www.speda.net/tv1/',                                                   method: 'iframe', color: 'orange' },   // ändrad till iframe för att spela i samma ruta
+    { name: 'Speda',         url: 'https://www.speda.net/tv1/',                                                   method: 'iframe', color: 'orange' },
     { name: 'Speda Drama',         url: 'https://www.speda.net/tv2/',                                                method: 'iframe', color: 'orange' },
     { name: 'UTV Hawler1',         url: 'https://vsd123.okcdn.ru/hls/3527542770279.m3u8/sig/UYR0U0b2sXw/expires/1774979863442/srcIp/90.224.249.27/urls/185.226.53.66/clientType/0/srcAg/CHROME_MAC/mid/4728653618791/3527542770279_high/index.m3u8',                                                   color: 'green' },
     { name: 'UTV Hawler',       url: 'https://kurdtvs.net/utv-hawler',                                                      method: 'iframe', color: 'orange' },
@@ -186,7 +185,6 @@
     { name: 'Cihan TV',           url: 'https://www.cihanhd.com/',                                                             method: 'iframe', color: 'orange' },
   ];
 
-  // Karwan – alla byttes till iframe (spelas inne i videorutan)
   const karwanRaw = [
     { name: 'Kidco TV',           url: 'https://karwan.tv/kidco-tv',              method: 'iframe', color: 'blue',    subgroup: 'blue' },
     { name: 'MMN Kids',           url: 'https://karwan.tv/mmn-kids',              method: 'iframe', color: 'blue',    subgroup: 'blue' },
@@ -270,7 +268,6 @@
     { name: 'iFilm Arabic',  url: 'https://live.presstv.ir/hls/ifilmar.m3u8',                       color: 'blue' }
   ];
 
-  // ========== ORDNINGSLAGRING (localStorage) ==========
   function loadOrder(cat) { try { const ord = localStorage.getItem(`order_${cat}`); return ord ? JSON.parse(ord) : null; } catch(e){ return null; } }
   function saveOrder(cat, arr) { localStorage.setItem(`order_${cat}`, JSON.stringify(arr.map(c=>c.url))); }
 
@@ -291,13 +288,9 @@
     saveOrder(catKey, newOrderArray);
   }
 
-  let kurdish = [...kurdishRaw];
-  let karwan = [...karwanRaw];
-  let ifilm = [...ifilmRaw];
-  kurdish = applyStoredOrder(kurdish, 'kurdish');
-  karwan = applyStoredOrder(karwan, 'karwan');
-  ifilm = applyStoredOrder(ifilm, 'ifilm');
-
+  let kurdish = applyStoredOrder([...kurdishRaw], 'kurdish');
+  let karwan = applyStoredOrder([...karwanRaw], 'karwan');
+  let ifilm = applyStoredOrder([...ifilmRaw], 'ifilm');
   const channels = { kurdish, karwan, ifilm };
   
   let hlsInst = null;
@@ -309,8 +302,6 @@
   let curSub = 'all';
   let dragSource = null;
 
-  function e(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
-
   function render(filter, sub) {
     curFilter = filter; curSub = sub || 'all';
     const catNames = { kurdish:'🏔 Kurdiska', karwan:'⭐ Karwan TV', ifilm:'🌍 iFilm' };
@@ -318,7 +309,7 @@
     
     const row = (ch, idx, catKey) => {
       const m = ch.method || 'hls';
-      const badge = m==='iframe' ? ' <span class="tag">📺 live</span>' : m==='external' ? ' <span class="tag">🔗</span>' : '';
+      const badge = m==='iframe' ? ' <span class="tag">📺 live</span>' : '';
       const star = favs.some(f=>f.url===ch.url) ? '⭐' : '☆';
       const activeClass = (cur && cur.url===ch.url) ? 'active' : '';
       return `<div class="channel-item ${ch.color} ${activeClass}" draggable="true" data-url="${e(ch.url)}" data-name="${e(ch.name)}" data-method="${m}" data-referer="${ch.referer||''}" data-cat="${catKey}" data-idx="${idx}">
@@ -340,6 +331,39 @@
     }
     document.getElementById('ch-container').innerHTML = html;
     attachDragListeners();
+    attachChannelEvents(); // adds click/dblclick
+  }
+
+  function attachChannelEvents() {
+    const items = document.querySelectorAll('.channel-item');
+    items.forEach(el => {
+      // Remove old listeners to avoid duplicates
+      el.removeEventListener('click', handleSingleClick);
+      el.removeEventListener('dblclick', handleDoubleClick);
+      el.addEventListener('click', handleSingleClick);
+      el.addEventListener('dblclick', handleDoubleClick);
+    });
+  }
+
+  function handleSingleClick(e) {
+    // Prevent if clicking on fav button
+    if (e.target.classList.contains('fav-btn')) return;
+    const item = e.currentTarget;
+    const url = item.getAttribute('data-url');
+    const name = item.getAttribute('data-name');
+    const method = item.getAttribute('data-method');
+    const referer = item.getAttribute('data-referer');
+    play(url, name, method, referer);
+  }
+
+  function handleDoubleClick(e) {
+    if (e.target.classList.contains('fav-btn')) return;
+    const item = e.currentTarget;
+    const url = item.getAttribute('data-url');
+    const name = item.getAttribute('data-name');
+    const method = item.getAttribute('data-method');
+    const referer = item.getAttribute('data-referer');
+    play(url, name, method, referer);
   }
 
   function attachDragListeners() {
@@ -407,14 +431,12 @@
     dragSource = null;
   }
 
-  // Spelare med tydlig feedback
   function play(url, name, method, referer) {
     if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
     cur = {url, name, method, referer};
     document.getElementById('ch-title').textContent = name;
     if (hlsInst) { hlsInst.destroy(); hlsInst = null; }
     const wrap = document.getElementById('vwrap');
-    // Visa laddningsindikator
     wrap.innerHTML = `<div style="display:flex; align-items:center; justify-content:center; height:100%;"><div class="spinner"></div><span style="margin-left:12px;">Laddar ${name}...</span></div>`;
 
     setTimeout(() => {
@@ -425,7 +447,6 @@
         return;
       }
 
-      // HLS eller native video
       wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
       const vid = document.getElementById('vplayer');
       if (Hls.isSupported()) {
@@ -460,7 +481,7 @@
   }
 
   function showErr() {
-    document.getElementById('vwrap').innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte ladda stream</h3><p>Kontrollera din internetanslutning eller prova att stänga av JS (knappen ovan).</p><button class="btn" onclick="reload()">↻ Försök igen</button></div>`;
+    document.getElementById('vwrap').innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte ladda stream</h3><p>Kontrollera internet eller prova att stänga av JS (knappen ovan).</p><button class="btn" onclick="reload()">↻ Försök igen</button></div>`;
   }
 
   function reload() { if (cur) play(cur.url, cur.name, cur.method, cur.referer); }
@@ -489,6 +510,7 @@
   function outsideDD(e) { if (!document.getElementById('karwan-dd').contains(e.target) && !document.getElementById('karwan-btn').contains(e.target)) closeDD(); }
   function toggleList() { document.getElementById('channel-list').classList.toggle('show'); }
   function fav(url,name) { const i=favs.findIndex(f=>f.url===url); i>-1? favs.splice(i,1): favs.push({url,name}); localStorage.setItem('xomfavs',JSON.stringify(favs)); render(curFilter,curSub); }
+  function e(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
   (function loadPrefs() {
     try {
