@@ -14,7 +14,192 @@
     .main-container { display: flex; flex: 1; overflow: hidden; }
 
     /* Sidopanel */
+    .sidebar { width: 350px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; border-right: 1px solid #333; }<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kurdish · Karwan · iFilm FULL PLAYER</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    :root { --accent: #4ecca3; --bg: #0f2027; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .header { padding: 10px; background: rgba(0,0,0,0.5); text-align: center; border-bottom: 1px solid var(--accent); }
+    .main-container { display: flex; flex: 1; overflow: hidden; }
     .sidebar { width: 350px; background: rgba(0,0,0,0.3); display: flex; flex-direction: column; border-right: 1px solid #333; }
+    .filter-nav { padding: 8px; display: flex; gap: 4px; flex-wrap: wrap; background: rgba(0,0,0,0.2); }
+    .filter-btn { background: #1e2f3f; color: #fff; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.75rem; }
+    .filter-btn.active { background: var(--accent); color: #000; }
+    .channel-list { flex: 1; overflow-y: auto; padding: 10px; }
+    .channel-item { padding: 8px 12px; margin-bottom: 4px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.85rem; transition: 0.2s; }
+    .channel-item:hover { filter: brightness(1.2); transform: translateX(4px); }
+    .channel-item.active { outline: 2px solid var(--accent); font-weight: bold; }
+    
+    /* Färger */
+    .green { background: rgba(40,167,69,0.5); }
+    .blue { background: rgba(0,123,255,0.5); }
+    .orange { background: rgba(253,126,20,0.5); }
+    .purple { background: rgba(111,66,193,0.5); }
+    .pink { background: rgba(232,62,140,0.5); }
+    .grey { background: rgba(108,117,125,0.5); }
+    .yellow { background: rgba(255,193,7,0.5); color: #000; }
+    .maroon { background: rgba(128,0,0,0.5); }
+    .special { background: rgba(255,215,0,0.6); color: #000; animation: blink 2s infinite; }
+    @keyframes blink { 50% { opacity: 0.8; } }
+
+    .player-area { flex: 1; background: #000; display: flex; flex-direction: column; }
+    .video-wrapper { flex: 1; position: relative; }
+    video, iframe { width: 100%; height: 100%; border: none; }
+    .controls { padding: 10px 20px; background: #111; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; }
+    .js-btn { padding: 8px 18px; border-radius: 25px; border: none; cursor: pointer; font-weight: bold; }
+    .js-on { background: var(--accent); color: #000; }
+    .js-off { background: #ff4444; color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h2>KURDISH · KARWAN · iFILM ✨ FULL VERSION</h2>
+</div>
+
+<div class="main-container">
+  <aside class="sidebar">
+    <div class="filter-nav">
+      <button class="filter-btn active" onclick="render('all', this)">Alla</button>
+      <button class="filter-btn" onclick="render('kurdish', this)">Kurdiska</button>
+      <button class="filter-btn" onclick="render('karwan', this)">Karwan</button>
+      <button class="filter-btn" onclick="render('ifilm', this)">iFilm</button>
+    </div>
+    <div class="channel-list" id="ch-list"></div>
+  </aside>
+
+  <main class="player-area">
+    <div class="video-wrapper" id="vwrap">
+      <div style="padding:100px; text-align:center; opacity:0.3;"><h2>Välj en kanal</h2></div>
+    </div>
+    <div class="controls">
+      <div id="playing-now" style="color:var(--accent)">Stoppad</div>
+      <button id="jsToggleBtn" class="js-btn js-on" onclick="toggleJS()">⚙️ JS MOTOR: PÅ</button>
+    </div>
+  </main>
+</div>
+
+<script>
+  let jsEnabled = true;
+  let hls = null;
+  let currentCh = null;
+
+  const data = {
+    kurdish: [
+      { name: 'AVA 2 (Facebook)', url: 'https://scontent-arn2-1.xx.fbcdn.net/hvideo-odn-cln/_nc_cat-104/_nc_sr_t-4/v/rASckW3Fx-mZF1IKoBAqKmwUho6KZWXyFUo-mGsqWW09TTA/_nc_ohc-2ytV2QWVLqAQ7kNvwGouASZ/live-dash/dash-abr-ibr-audio/1316351023954759.mpd?_nc_zt=28&ccb=2-4&ms=m_CTPA&sc_t=1&oh=00_Af10Uj4WzxahKsAXa_UNGs8fCqr_UHAlsWRO69V-B9AtKQ&oe=69D1F1EF', color: 'special' },
+      { name: 'Zagros', url: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', color: 'green' },
+      { name: 'MMN News', url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8', color: 'green' },
+      { name: 'Kanal8', url: 'https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8', color: 'green' },
+      { name: 'AVA 1', url: 'https://ava1.store/upload/ava.m3u8', color: 'green' },
+      { name: 'AVA 3', url: 'https://ava5.store/upload/ava.m3u8', color: 'green' },
+      { name: 'Rudaw', url: 'https://live.rudaw.net/hls/rudaw-tv/stream_1080p.m3u8', color: 'green' },
+      { name: 'Kurdsat News', url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_NEWS/HLS/KURDSAT_NEWS.m3u8', color: 'green' },
+      { name: 'Kurdsat HD', url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8', color: 'green' },
+      { name: 'NRT News', url: 'https://live20.bozztv.com/giatv/giatv-nrt/nrt/chunks.m3u8', color: 'green' },
+      { name: 'Rojava HD', url: 'https://hlspackager.akamaized.net/live/DB/ROJAVA_HD/HLS/ROJAVA_HD.m3u8', color: 'green' },
+      { name: 'Kurdistan24', url: 'https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8', color: 'green' },
+      { name: 'GK', url: 'https://live.host247.net/gk/gksat/chunklist_w624411416.m3u8', color: 'green' },
+      { name: 'TRT Kurdî', url: 'https://tv-trtkurdi.medya.trt.com.tr/master_1440.m3u8', color: 'green' },
+      { name: 'Kirkuk', url: 'https://live.kirkuklive.live/hls/stream/index.m3u8', color: 'green' },
+      { name: 'Waar', url: 'https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8', color: 'green' },
+      { name: 'Kurdistan TV', url: 'https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8', color: 'green' },
+      { name: 'Aryen TV', url: 'https://stream.aryen.tv/live/tv/playlist.m3u8', color: 'green' },
+      { name: 'PDKI', url: 'https://kurdchhls.wns.live/hls/stream.m3u8', color: 'green' },
+      { name: 'Komala', url: 'https://komhls.wns.live/hls/stream.m3u8', color: 'green' },
+      { name: '4 Kurd', url: 'https://4kuhls.persiana.live/hls/stream.m3u8', color: 'green' },
+      { name: 'MMN Clip', url: 'http://mmn.mypsx.net:1935/live/mmnhdclip/playlist.m3u8', color: 'green' },
+      { name: 'Medmusik', url: 'http://54.36.110.140/live3/live3.m3u8', color: 'green' },
+      { name: 'KurdMax music', url: 'https://6476e46b58f91.streamlock.net/music/MUSIC2402/chunklist_w1890238732.m3u8', color: 'green' },
+      { name: 'Befrin TV', url: 'https://cdn.karwan.tv/befrin-tv/index.m3u8', color: 'green' },
+      { name: 'Afarin Kids', url: 'https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8', color: 'green' },
+      { name: 'Zarok Sorani', url: 'https://zindisorani.zaroktv.com.tr/hls/stream.m3u8', color: 'green' },
+      { name: 'Speda', url: 'https://www.speda.net/tv1/', method: 'iframe', color: 'orange' },
+      { name: 'Cihan TV', url: 'https://www.cihanhd.com/', method: 'iframe', color: 'orange' }
+    ],
+    karwan: [
+      { name: 'Kidco TV', url: 'https://karwan.tv/kidco-tv', method: 'iframe', color: 'blue' },
+      { name: 'MMN Kids', url: 'https://karwan.tv/mmn-kids', method: 'iframe', color: 'blue' },
+      { name: 'MMN Movies', url: 'https://karwan.tv/mmn-movies', method: 'iframe', color: 'purple' },
+      { name: 'Bnar Movies', url: 'https://karwan.tv/bnar-movies', method: 'iframe', color: 'purple' },
+      { name: 'MMN Drama', url: 'https://karwan.tv/mmn-drama', method: 'iframe', color: 'pink' },
+      { name: 'Kurdmax TV', url: 'https://karwan.tv/kurdmax-tv', method: 'iframe', color: 'pink' },
+      { name: 'Karwan Duhok', url: 'https://karwan.tv/duhok-tv', method: 'iframe', color: 'grey' },
+      { name: 'Kurdmax Music', url: 'https://karwan.tv/kurdmax-music', method: 'iframe', color: 'yellow' },
+      { name: 'NRT 4', url: 'https://karwan.tv/nrt-4', method: 'iframe', color: 'green' },
+      { name: 'UTV Hawler', url: 'https://karwan.tv/utv-hawler', method: 'iframe', color: 'green' },
+      { name: 'Speda TV', url: 'https://karwan.tv/speda-tv', method: 'iframe', color: 'beige' }
+    ],
+    ifilm: [
+      { name: 'iFilm Farsi', url: 'https://live.presstv.ir/hls/ifilmfa.m3u8', color: 'blue' },
+      { name: 'iFilm English', url: 'https://live.presstv.ir/hls/ifilmen.m3u8', color: 'blue' },
+      { name: 'iFilm Arabic', url: 'https://live.presstv.ir/hls/ifilmar.m3u8', color: 'blue' }
+    ]
+  };
+
+  function render(filter, btn) {
+    if(btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    const container = document.getElementById('ch-list');
+    container.innerHTML = '';
+    let list = filter === 'all' ? [...data.kurdish, ...data.karwan, ...data.ifilm] : data[filter];
+    list.forEach(ch => {
+      const div = document.createElement('div');
+      div.className = `channel-item ${ch.color}`;
+      div.innerHTML = `<span>${ch.name}</span> <small>${ch.method === 'iframe' ? 'WEB' : 'HLS'}</small>`;
+      div.onclick = () => { currentCh = ch; play(ch, div); };
+      container.appendChild(div);
+    });
+  }
+
+  function play(ch, el) {
+    if(el) {
+      document.querySelectorAll('.channel-item').forEach(i => i.classList.remove('active'));
+      el.classList.add('active');
+    }
+    document.getElementById('playing-now').innerText = "Spelar: " + ch.name;
+    const vwrap = document.getElementById('vwrap');
+    vwrap.innerHTML = '';
+    if(hls) { hls.destroy(); hls = null; }
+
+    if(ch.method === 'iframe') {
+      const ifr = document.createElement('iframe');
+      ifr.src = ch.url;
+      ifr.allow = "autoplay; fullscreen";
+      vwrap.appendChild(ifr);
+    } else {
+      const vid = document.createElement('video');
+      vid.controls = true; vid.autoplay = true; vid.playsInline = true;
+      vwrap.appendChild(vid);
+      if (jsEnabled && ch.url.includes('.m3u8') && Hls.isSupported()) {
+        hls = new Hls();
+        hls.loadSource(ch.url);
+        hls.attachMedia(vid);
+      } else {
+        vid.src = ch.url;
+      }
+    }
+  }
+
+  function toggleJS() {
+    jsEnabled = !jsEnabled;
+    const btn = document.getElementById('jsToggleBtn');
+    btn.innerText = jsEnabled ? "⚙️ JS MOTOR: PÅ" : "⚙️ JS MOTOR: AV";
+    btn.className = jsEnabled ? "js-btn js-on" : "js-btn js-off";
+    if(currentCh) play(currentCh);
+  }
+
+  render('all');
+</script>
+</body>
+</html>
     .filter-nav { padding: 10px; display: flex; gap: 5px; flex-wrap: wrap; border-bottom: 1px solid #444; }
     .filter-btn { background: #1e2f3f; color: #fff; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.75rem; }
     .filter-btn.active { background: var(--accent); color: #000; }
