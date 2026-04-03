@@ -137,8 +137,8 @@
     { name: 'MMN News',         url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8',                                                  color: 'green' },
     { name: 'Kanal8',           url: 'https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8',                                              color: 'green' },
     { name: 'AVA1',             url: 'https://ava1.store/upload/ava.m3u8',                                                                      color: 'green' },
-    { name: 'AVA2',             url: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2FAvaNews.tv%2Fvideos%2F1316351023954759%2F&show_text=false&autoplay=true', method: 'iframe', color: 'green' },
-    { name: 'AVA3',             url: 'https://www.ava.news/livewatch',                                                                           method: 'iframe', color: 'green' },
+    { name: 'AVA2',             url: 'https://www.facebook.com/AvaNews.tv/videos/1316351023954759/', method: 'external', color: 'green' },
+    { name: 'AVA3',             url: 'https://live-azd1103.telewebion.ir/ek/azarbayjangharbi/live/576p/index.m3u8', color: 'green' },
     { name: 'Rudaw',            url: 'https://live.rudaw.net/hls/rudaw-tv/stream_1080p.m3u8',                                                   color: 'green' },
     { name: 'Kurdsat News',     url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_NEWS/HLS/KURDSAT_NEWS.m3u8',                            color: 'green' },
     { name: 'Kurdsat HD',       url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8',                               color: 'green' },
@@ -411,6 +411,14 @@
     document.getElementById('ch-title').textContent = name;
     destroyPlayers();
     const wrap = document.getElementById('vwrap');
+
+    // Extern kanal — öppnas i nytt fönster
+    if (method === 'external') {
+      window.open(url, '_blank');
+      wrap.innerHTML = `<div class="error-msg"><h3>🔗 ${name}</h3><p style="margin-top:10px;">Öppnades i ett nytt fönster.</p><button class="btn" style="margin-top:16px;" onclick="window.open('${url}','_blank')">↗ Öppna igen</button></div>`;
+      render(curFilter, curSub);
+      return;
+    }
 
     // iframe-kanaler
     if (method === 'iframe') {
