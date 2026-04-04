@@ -138,7 +138,7 @@
     { name: 'Kanal8',           url: 'https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8',                                              color: 'green' },
     { name: 'AVA1',             url: 'https://ava1.store/upload/ava.m3u8',                                                                      color: 'green' },
     { name: 'AVA2',             url: 'https://www.facebook.com/AvaNews.tv/videos/1316351023954759/', method: 'external', color: 'green' },
-    { name: 'AGH',             url: 'https://ncdn.telewebion.ir/azarbayjangharbi/live/playlist.m3u8', color: 'green' },
+    { name: 'AGH',              url: 'https://ncdn.telewebion.ir/azarbayjangharbi/live/playlist.m3u8', color: 'green' },
     { name: 'Rudaw',            url: 'https://live.rudaw.net/hls/rudaw-tv/stream_1080p.m3u8',                                                   color: 'green' },
     { name: 'Kurdsat News',     url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_NEWS/HLS/KURDSAT_NEWS.m3u8',                            color: 'green' },
     { name: 'Kurdsat HD',       url: 'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8',                               color: 'green' },
@@ -299,6 +299,94 @@
   let cur = null;
   let favs = [];
   let jsEnabled = true;
+  // ========== TV-detektion ==========
+  // Identifierar om vi kör på en Smart TV / svag enhet
+  function isTV() {
+    const ua = navigator.userAgent || '';
+    return /SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua) ||
+      (window.innerWidth >= 1920 && !('ontouchstart' in window) && navigator.maxTouchPoints === 0);
+  }
+
+  // ========== HLS-konfiguration anpassad per enhet ==========
+  // TV-enheter behöver större buffertar och mer aggressiv återanslutning
+  // för att klara av långsamma nätverk och minnesbegränsningar
+  function getHlsConfig(referer) {
+    const tv = isTV() || tvMode;
+    return {
+      enableWorker: true,
+      startPosition: -1,                          // hoppa till live-kanten
+      lowLatencyMode: false,                       // av — minskar risk för stall
+
+      // Buffer — TV behöver mer kudde mot nätverksvariation
+      maxBufferLength:          tv ? 40  : 10,    // sekunder att fylla
+      maxMaxBufferLength:       tv ? 120 : 30,    // absolut max
+      maxBufferSize:            tv ? 120*1000*1000 : 60*1000*1000, // bytes
+      maxBufferHole:            tv ? 1.0 : 0.5,   // tolerans för hål i timeline
+
+      // Live-synkronisering
+      liveSyncDurationCount:    tv ? 5   : 3,     // antal segment bakom live
+      liveMaxLatencyDurationCount: tv ? 10 : 6,
+
+      // Segment-laddning — fler och längre försök på TV
+      fragLoadingMaxRetry:      tv ? 8   : 4,
+      fragLoadingRetryDelay:    tv ? 1500: 1000,
+      fragLoadingMaxRetryTimeout: tv ? 16000 : 8000,
+
+      // Manifest-laddning
+      manifestLoadingMaxRetry:  tv ? 6   : 3,
+      manifestLoadingRetryDelay: tv ? 1500: 1000,
+
+      // Nivå-laddning
+      levelLoadingMaxRetry:     tv ? 6   : 3,
+      levelLoadingRetryDelay:   tv ? 1500: 1000,
+
+      // Kvalitetsval — TV väljer lägre kvalitet för stabilitet
+      startLevel:               tv ? 0   : -1,    // 0 = lägsta, -1 = auto
+      autoStartOnStall:         true,
+
+      xhrSetup(xhr) {
+        const ua = document.getElementById('ua-select').value;
+        if (ua) try { xhr.setRequestHeader('User-Agent', ua); } catch(err){}
+        if (referer) try { xhr.setRequestHeader('Referer', referer); } catch(err){}
+      }
+    };
+  }
+
+  // ========== Övervaka video-stall och återstarta automatiskt ==========
+  let stallTimer = null;
+  let lastTime = -1;
+  function startStallWatcher(vid) {
+    clearStallWatcher();
+    lastTime = -1;
+    // Kontrollera var 5:e sekund om videon faktiskt framskrider
+    stallTimer = setInterval(() => {
+      if (!vid || vid.paused || vid.ended || vid.readyState < 2) return;
+      const t = vid.currentTime;
+      if (t === lastTime && vid.readyState < 4) {
+        // Videon har fastnat — försök återhämta
+        console.warn('[StallWatcher] Stall detekterat, försöker återhämta…');
+        if (hlsInst) {
+          // Hoppa lite bakåt i live-bufferten och fortsätt
+          try {
+            const ranges = vid.buffered;
+            if (ranges.length > 0) {
+              const end = ranges.end(ranges.length - 1);
+              if (end - t > 2) {
+                vid.currentTime = end - 1.5; // hoppa till nära live-kanten
+              }
+            }
+            hlsInst.startLoad();
+          } catch(e) {}
+          vid.play().catch(() => {});
+        }
+      }
+      lastTime = t;
+    }, 5000);
+  }
+  function clearStallWatcher() {
+    if (stallTimer) { clearInterval(stallTimer); stallTimer = null; }
+  }
+
   try { favs = JSON.parse(localStorage.getItem('xomfavs') || '[]'); } catch(e) { favs = []; }
   let curFilter = null;
   let curSub = 'all';
@@ -307,6 +395,7 @@
   function e(s) { return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
 
   function destroyPlayers() {
+    clearStallWatcher();
     if (hlsInst) { hlsInst.destroy(); hlsInst = null; }
     if (dashInst) { dashInst.reset(); dashInst = null; }
   }
@@ -433,7 +522,7 @@
       return;
     }
 
-    // DASH-kanaler (t.ex. AVA2 med .mpd)
+    // DASH-kanaler
     if (method === 'dash') {
       if (!jsEnabled) {
         wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
@@ -473,35 +562,41 @@
       return;
     }
 
-    // JS PÅ: visa spinner, starta sedan HLS
+    // JS PÅ: visa spinner, starta sedan HLS med TV-optimerade inställningar
     wrap.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;"><div class="spinner"></div><span style="margin-left:12px;">Laddar ${name}…</span></div>`;
     setTimeout(() => {
       wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
       const vid = document.getElementById('vplayer');
       if (Hls.isSupported()) {
-        hlsInst = new Hls({
-          enableWorker: true,
-          startPosition: -1,
-          liveSyncDurationCount: 3,
-          maxBufferLength: 10,
-          xhrSetup(xhr) {
-            const ua = document.getElementById('ua-select').value;
-            if (ua) try { xhr.setRequestHeader('User-Agent', ua); } catch(err){}
-            if (referer) try { xhr.setRequestHeader('Referer', referer); } catch(err){}
-          }
-        });
+        hlsInst = new Hls(getHlsConfig(referer));
         hlsInst.loadSource(url);
         hlsInst.attachMedia(vid);
-        hlsInst.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(err=>console.warn(err)));
+        hlsInst.on(Hls.Events.MANIFEST_PARSED, () => {
+          vid.play().catch(err => console.warn(err));
+          startStallWatcher(vid); // starta stall-bevakning direkt efter manifest laddats
+        });
         hlsInst.on(Hls.Events.ERROR, (_, d) => {
           if (!d.fatal) return;
-          if (d.type === Hls.ErrorTypes.NETWORK_ERROR) setTimeout(()=>{ if(hlsInst) hlsInst.startLoad(); }, 2000);
-          else if (d.type === Hls.ErrorTypes.MEDIA_ERROR) hlsInst.recoverMediaError();
-          else showErr();
+          if (d.type === Hls.ErrorTypes.NETWORK_ERROR) {
+            // Nätverksfel — vänta lite längre på TV innan omstart
+            const delay = (isTV() || tvMode) ? 3000 : 2000;
+            setTimeout(() => { if (hlsInst) hlsInst.startLoad(); }, delay);
+          } else if (d.type === Hls.ErrorTypes.MEDIA_ERROR) {
+            hlsInst.recoverMediaError();
+          } else {
+            showErr();
+          }
+        });
+        // Extra: lyssna på stall-event från HLS.js
+        hlsInst.on(Hls.Events.FRAG_LOAD_EMERGENCY_ABORTED, () => {
+          console.warn('[HLS] Emergency abort – startar om laddning');
+          setTimeout(() => { if (hlsInst) hlsInst.startLoad(); }, 2000);
         });
       } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safaris inbyggda HLS (t.ex. Apple TV, iPhone)
         vid.src = url;
-        vid.play().catch(()=>showErr());
+        vid.play().catch(() => showErr());
+        startStallWatcher(vid);
       } else {
         showErr();
       }
@@ -525,6 +620,8 @@
     if(tvMode && document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
     else if(document.fullscreenElement) document.exitFullscreen();
     localStorage.setItem('xomtv', tvMode ? '1' : '');
+    // Starta om nuvarande kanal med rätt buffert-inställningar för det nya läget
+    if (cur) reload();
   }
 
   function toggleJSengine() {
@@ -556,9 +653,9 @@
       btn.classList.toggle('js-toggle-off', !jsEnabled);
     } catch(err) {}
     const ua = navigator.userAgent || '';
-    const isTV = /SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua) ||
+    const detectedTV = /SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua) ||
       (window.innerWidth >= 1920 && !('ontouchstart' in window) && navigator.maxTouchPoints === 0);
-    if (isTV || localStorage.getItem('xomtv') === '1') {
+    if (detectedTV || localStorage.getItem('xomtv') === '1') {
       document.body.classList.add('tv-mode');
       tvMode = true;
       document.getElementById('tv-btn').textContent = '🖥️ Normal';
