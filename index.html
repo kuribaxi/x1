@@ -260,6 +260,7 @@ const musikRaw = [
   { name: 'MMN Clip',      url: 'http://mmn.mypsx.net:1935/live/mmnhdclip/playlist.m3u8',                                              color: 'yellow' },
   { name: 'Medmusik',      url: 'http://54.36.110.140/live3/live3.m3u8',                                                                color: 'yellow' },
   { name: 'KurdMax Music', url: 'https://6476e46b58f91.streamlock.net/music/MUSIC2402/chunklist_w1890238732.m3u8',                      color: 'yellow' },
+   { name: 'AZADI', url: 'https://karwan.tv/azadi-tv/',                      method:'iframe', color:'yellow',  subgroup:'yellow' },
 ];
 
 // 3. MINAL (BARN)
@@ -270,9 +271,12 @@ const minalRaw = [
   { name: 'Zarok Kurmanci', url: 'https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8',                                            color: 'blue' },
   { name: 'Zarok Sorani',   url: 'https://zindisorani.zaroktv.com.tr/hls/stream.m3u8',                                                color: 'blue' },
   { name: 'MMN Kids',       url: 'http://mmn.mypsx.net:1935/live/mmnhdkids/playlist.m3u8',                                            color: 'blue' },
-  { name: 'Kurdmax Pepule',     url: 'https://karwan.tv/kurdmax-pepule',        method:'iframe', color:'blue',    subgroup:'blue' },
-  { name: 'Jojo Mama',          url: 'https://karwan.tv/jojo-mama',             method:'iframe', color:'blue',    subgroup:'blue' },
-  { name: 'Astera Baby',        url: 'https://karwan.tv/astera-baby',           method:'iframe', color:'blue',    subgroup:'blue' },
+  { name: 'Kurdmax Pepule',     url: 'https://karwan.tv/kurdmax-pepule',        method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Jojo Mama',          url: 'https://karwan.tv/jojo-mama',             method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Astera Baby',        url: 'https://karwan.tv/astera-baby',           method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Znar',        url: 'https://karwan.tv/znar-kids/',           method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'znar-kids',          url: 'https://karwan.tv/znar-kids/',             method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'spi-kids',          url: 'https://karwan.tv/spi-kids/',             method:'iframe', color:'yellow',  subgroup:'yellow' },
 ];
 
 // 4. FILM & SERIE
@@ -290,8 +294,30 @@ const filmRaw = [
   { name: 'Cihan TV',          url: 'https://www.cihanhd.com/',                                          method:'iframe', color: 'orange' },
   { name: 'Speda Drama',       url: 'https://www.speda.net/tv2/',                                        method:'iframe', color: 'orange' },
   { name: 'UTV Hawler',        url: 'https://kurdtvs.net/utv-hawler',                                    method:'iframe', color: 'orange' },
-  { name: 'Astera Movies',      url: 'https://karwan.tv/astera-movies',         method:'iframe', color:'purple',  subgroup:'purple' },
-  { name: 'Derwaze TV',         url: 'https://karwan.tv/derwaze-tv',            method:'iframe', color:'purple',  subgroup:'purple' },
+  { name: 'Astera Movies',      url: 'https://karwan.tv/astera-movies',         method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Derwaze TV',         url: 'https://karwan.tv/derwaze-tv',            method:'iframe', color:'yellow',  subgroup:'yellow' },
+   { name: 'zed-tv-plus',  url: 'https://karwan.tv/zed-tv-plus/',             method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'soran-entertainment-tv',          url: 'https://karwan.tv/soran-entertainment-tv/',                                   method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'zed-tv',         url: 'https://karwan.tv/zed-tv/',                                      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'soz-tv/,        url: 'https://karwan.tv/soz-tv/',                                 method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'zaxo-tv',           url: 'https://karwan.tv/zaxo-tv/',                                    method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'barin-family',           url: 'https://karwan.tv/barin-family/',                                   method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'barin-movies',          url: 'https://karwan.tv/barin-movies/',                                       method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'delal-tv',       url: 'https://karwan.tv/delal-tv/',                                       method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'barin-family',        url: 'https://karwan.tv/barin-family/',                                    method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'halabja-tv',      url: 'https://karwan.tv/halabja-tv/',         method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'infinity-tv',         url: 'https://karwan.tv/infinity-tv/,            method:'iframe', color:'yellow',  subgroup:'yellow' },
+];
+  
+ 
+  
+
+
+
+
+
+
+
 ];
 
 // 5. DINI
@@ -299,14 +325,27 @@ const diniRaw = [
   { name: 'Amozhgary', url: 'https://app-live.org/live/3268334b/index.m3u8',                                                          color: 'teal' },
   { name: 'MMN Quran',  url: 'http://mmn.mypsx.net:1935/live/mmnhdquran/playlist.m3u8',                                              color: 'teal' },
   { name: 'Eman TV',    url: 'https://avr.host247.net/live/emantv/tracks-v1a1/mono.m3u8',                                            color: 'teal' },
+  { name: 'Amozhgary', url: 'https://karwan.tv/spi-quran/',                                              method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'MMN Quran',  url: ' https://karwan.tv/utv-duhok/',                                              method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Eman TV',    url: 'https://karwan.tv/baboly-tv/',                                             method:'iframe', color:'yellow',  subgroup:'yellow' }
 ];
 
-// 6. SPORT
+// 6. SPORT/NATUR/CULTURE
 const sportRaw = [
   { name: 'MMN Sport', url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8', color: 'red' },
+  { name: 'MMN Documentary',   url: 'http://mmn.mypsx.net:1935/live/mmnhddocumentary/playlist.m3u8',                  color: 'red' },
   { name: 'Astera Culture',     url: 'https://karwan.tv/astera-culture',        method:'iframe', color:'yellow',  subgroup:'yellow' },
-  { name: 'Reng Documentary',   url: 'https://karwan.tv/reng-documentary',      method:'iframe', color:'maroon',  subgroup:'maroon' },
-   { name: 'MMN Documentary',   url: 'http://mmn.mypsx.net:1935/live/mmnhddocumentary/playlist.m3u8',                                 color: 'purple' },
+  { name: 'Reng Documentary',   url: 'https://karwan.tv/reng-documentary',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Znar',     url: 'https://karwan.tv/znar-tv/',        method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'Zhyar klass',   url: 'https://karwan.tv/zhyar-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'animal-box',   url: 'https://karwan.tv/animal-box/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'bask-tv',   url: 'https://karwan.tv/bask-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'srusht-tv',   url: 'https://karwan.tv/srusht-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'spi-tv',   url: 'https://karwan.tv/spi-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'cira-tv',   url: 'https://karwan.tv/cira-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'dever-tv',   url: 'https://karwan.tv/dever-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'dimen-tv',   url: 'https://karwan.tv/dimen-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
+  { name: 'kurdana-tv',   url: 'https://karwan.tv/kurdana-tv/',      method:'iframe', color:'yellow',  subgroup:'yellow' },
 ];
 
 // 7. KARWAN
