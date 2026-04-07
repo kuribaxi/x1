@@ -59,10 +59,23 @@
     .error-msg { text-align: center; padding: 40px; color: #ffbb99; }
     .category-title { font-weight: 700; font-size: 1.05rem; padding: 10px 6px 5px; color: #4ecca3; border-bottom: 2px solid #4ecca3; margin: 10px 0 7px; }
     .channel-item {
-      padding: 8px 11px; margin: 5px 0; cursor: grab; border-radius: 18px; transition: all 0.2s;
+      padding: 8px 11px; margin: 5px 0; cursor: grab; border-radius: 18px; transition: all 0.2s ease;
       font-size: 0.87rem; display: flex; justify-content: space-between; align-items: center;
       background: rgba(255,255,255,0.1); backdrop-filter: blur(2px); user-select: none;
     }
+    /* ===== FÖRSTORING AV KANALNAMN VID HOVER ===== */
+    .channel-item span {
+      display: inline-block;
+      transition: font-size 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1), font-weight 0.2s ease, text-shadow 0.2s ease;
+      font-weight: 500;
+    }
+    .channel-item:hover span {
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-shadow: 0 0 2px rgba(0,0,0,0.5);
+      letter-spacing: 0.2px;
+    }
+    /* Behåll original hover-effekt utan att störa */
     .channel-item:active { cursor: grabbing; }
     .channel-item.drag-over { border: 2px dashed #4ecca3; background: #4ecca355; }
     .channel-item.green   { background: rgba(40,167,69,0.75); }
@@ -79,9 +92,10 @@
     .channel-item.beige   { background: rgba(245,245,220,0.85); color: #1e2f3f; }
     .channel-item.teal    { background: rgba(0,150,136,0.75); }
     .channel-item.red     { background: rgba(220,53,69,0.75); }
-    .channel-item:hover   { opacity: 0.9; transform: translateX(4px); filter: brightness(1.05); }
+    .channel-item:hover   { opacity: 0.95; transform: translateX(4px); filter: brightness(1.02); }
     .channel-item.active  { box-shadow: 0 0 0 2px #4ecca3, 0 0 12px #4ecca3; font-weight: bold; background: rgba(0,0,0,0.5); }
-    .fav-btn { background: none; border: none; color: #ffd966; cursor: pointer; font-size: 1.1rem; text-shadow: 0 0 2px black; margin-left: 6px; }
+    .fav-btn { background: none; border: none; color: #ffd966; cursor: pointer; font-size: 1.1rem; text-shadow: 0 0 2px black; margin-left: 6px; transition: transform 0.1s; }
+    .fav-btn:hover { transform: scale(1.15); }
     .tag { font-size: 0.62rem; opacity: 0.85; margin-left: 5px; background: #00000066; padding: 1px 5px; border-radius: 18px; }
     .spinner { display: inline-block; width: 22px; height: 22px; border: 3px solid rgba(78,204,163,0.3); border-radius: 50%; border-top-color: #4ecca3; animation: spin 0.8s linear infinite; vertical-align: middle; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -142,7 +156,7 @@
 
 <div class="header">
   <h1>KURDISH · KARWAN · iFILM ✨</h1>
-  <p>Dra för att ändra ordning • Klicka för att spela</p>
+  <p>Dra för att ändra ordning • Hovra över kanalnamn → de förstoras!</p>
 </div>
 
 <div class="nav-buttons">
@@ -222,7 +236,7 @@
       </div>
     </div>
     <div class="video-wrapper" id="vwrap">
-      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning • Tryck JS AV om kanalen inte startar</p></div>
+      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning • Hovra över kanalnamn så förstoras de tydligt!</p></div>
     </div>
   </main>
 </div>
