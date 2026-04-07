@@ -10,581 +10,170 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; min-height: 100vh; }
     .header { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); padding: 18px 20px; text-align: center; border-bottom: 1px solid rgba(78,204,163,0.3); }
-    .header h1 { font-size: 2.3em; color: #4ecca3; letter-spacing: -0.5px; margin-bottom: 6px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-    .header p { opacity: 0.8; font-size: 0.95rem; }
-    .nav-buttons { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; background: rgba(0,0,0,0.25); position: relative; border-bottom: 1px solid rgba(78,204,163,0.15); }
-    .nav-btn { background: #1e2f3f; color: #e0e0e0; border: none; padding: 7px 16px; border-radius: 40px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; font-size: 0.85rem; box-shadow: 0 1px 3px rgba(0,0,0,0.2); white-space: nowrap; }
-    .nav-btn:hover, .nav-btn.active { background: #4ecca3; color: #0a1c2a; transform: scale(1.02); box-shadow: 0 4px 10px rgba(78,204,163,0.3); }
-    .dd-wrap { position: relative; display: inline-block; }
-    .dropdown-menu { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #0f212ed9; backdrop-filter: blur(12px); border-radius: 18px; padding: 10px; min-width: 200px; z-index: 1000; display: none; border: 1px solid #4ecca355; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-    .dropdown-menu.show { display: block; }
-    .dropdown-item { padding: 9px 16px; cursor: pointer; border-radius: 30px; transition: all 0.2s; margin: 3px 0; background: rgba(255,255,255,0.05); font-weight: 500; font-size: 0.85rem; }
-    .dropdown-item:hover { background: #4ecca3; color: #0a1c2a; transform: translateX(5px); }
-    .container { display: flex; height: calc(100vh - 230px); padding: 0 16px 16px; gap: 16px; }
-    .channel-list { width: 280px; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); overflow-y: auto; border-radius: 22px; padding: 12px; scrollbar-width: thin; }
-    .video-container { flex: 1; background: #03090e; border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2c5f6e; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-    .video-header { background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #4ecca355; }
-    .video-title { font-size: 1.2rem; font-weight: bold; color: #4ecca3; }
-    .video-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .btn { background: #1f3e48; color: white; border: none; padding: 6px 14px; border-radius: 40px; cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: 0.2s; }
-    .btn:hover { background: #4ecca3; color: #0a1c2a; transform: translateY(-1px); }
-    .ua-selector { padding: 3px 0; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 7px; }
-    .ua-selector select { background: #1e2f3f; color: white; border: 1px solid #4ecca3; padding: 4px 10px; border-radius: 28px; cursor: pointer; font-size: 0.73rem; }
-    .video-wrapper { flex: 1; position: relative; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    video { width: 100%; height: 100%; object-fit: contain; border: none; background: black; }
-    .error-msg { text-align: center; padding: 40px; color: #ffbb99; }
-    .category-title { font-weight: 700; font-size: 1.05rem; padding: 10px 6px 5px; color: #4ecca3; border-bottom: 2px solid #4ecca3; margin: 10px 0 7px; }
-    .channel-item { padding: 8px 11px; margin: 5px 0; cursor: grab; border-radius: 18px; transition: all 0.2s; font-size: 0.87rem; display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.1); backdrop-filter: blur(2px); user-select: none; }
-    .channel-item:active { cursor: grabbing; }
-    .channel-item.drag-over { border: 2px dashed #4ecca3; background: #4ecca355; }
-    .channel-item.green   { background: rgba(40,167,69,0.75); }
-    .channel-item.cyan    { background: rgba(23,162,184,0.75); }
-    .channel-item.orange  { background: rgba(253,126,20,0.75); }
-    .channel-item.purple  { background: rgba(111,66,193,0.75); }
-    .channel-item.blue    { background: rgba(0,123,255,0.75); }
-    .channel-item.pink    { background: rgba(232,62,140,0.75); }
-    .channel-item.grey    { background: rgba(108,117,125,0.75); }
-    .channel-item.yellow  { background: rgba(255,193,7,0.75); color:#1e2a2a; }
-    .channel-item.maroon  { background: rgba(128,0,0,0.75); }
-    .channel-item.brown   { background: rgba(139,69,19,0.75); }
-    .channel-item.magenta { background: rgba(255,0,255,0.75); }
-    .channel-item.beige   { background: rgba(245,245,220,0.85); color: #1e2f3f; }
-    .channel-item.teal    { background: rgba(0,150,136,0.75); }
-    .channel-item.red     { background: rgba(220,53,69,0.75); }
-    .channel-item:hover   { opacity: 0.9; transform: translateX(4px); filter: brightness(1.05); }
-    .channel-item.active  { box-shadow: 0 0 0 2px #4ecca3, 0 0 12px #4ecca3; font-weight: bold; background: rgba(0,0,0,0.5); }
-    .fav-btn { background: none; border: none; color: #ffd966; cursor: pointer; font-size: 1.1rem; text-shadow: 0 0 2px black; margin-left: 6px; }
-    .tag { font-size: 0.62rem; opacity: 0.85; margin-left: 5px; background: #00000066; padding: 1px 5px; border-radius: 18px; }
-    .spinner { display: inline-block; width: 22px; height: 22px; border: 3px solid rgba(78,204,163,0.3); border-radius: 50%; border-top-color: #4ecca3; animation: spin 0.8s linear infinite; vertical-align: middle; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-thumb { background: #4ecca3; border-radius: 10px; }
-    .close-btn { display: none; position: fixed; top: 18px; right: 18px; z-index: 1001; background: #dc3545; color: white; border: none; padding: 9px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; }
-    .js-toggle-off { background: #c95a2e !important; box-shadow: 0 0 8px #ff884d; }
-
-    /* ========== POPUP NOTICE (ersätter iframe-popup) ========== */
-    .popup-notice {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(10px);
-      z-index: 9000;
-      display: none; align-items: center; justify-content: center;
-    }
-    .popup-notice.show { display: flex; }
-    .popup-notice-box {
-      background: #0c1e2c;
-      border: 1px solid #4ecca355;
-      border-radius: 22px;
-      padding: 36px 40px;
-      max-width: 440px;
-      width: 90vw;
-      text-align: center;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-      animation: popIn 0.22s cubic-bezier(0.34,1.4,0.64,1);
-    }
-    @keyframes popIn { from { transform: scale(0.88) translateY(20px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
-    .popup-notice-icon { font-size: 3rem; margin-bottom: 12px; }
-    .popup-notice-title { font-size: 1.25rem; font-weight: 700; color: #4ecca3; margin-bottom: 8px; }
-    .popup-notice-sub { font-size: 0.85rem; color: #8ab8a8; line-height: 1.6; margin-bottom: 22px; }
-    .popup-notice-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .popup-notice-open { background: #4ecca3; color: #0a1c2a; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
-    .popup-notice-open:hover { background: #3db891; transform: translateY(-2px); }
-    .popup-notice-close { background: #1f3e48; color: #ccc; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 0.88rem; transition: 0.2s; }
-    .popup-notice-close:hover { background: #2e5a6a; }
-    .popup-notice-url { font-size: 0.72rem; color: #4a7a6a; margin-top: 14px; word-break: break-all; }
-
-    @media (max-width: 768px) {
-      .container { flex-direction: column; height: auto; }
-      .channel-list { position: fixed; left: 0; top: 0; width: 85%; max-width: 310px; height: 100%; z-index: 1000; border-radius: 0 22px 22px 0; padding: 18px; transform: translateX(-100%); transition: transform 0.25s ease; overflow-y: auto; background: #0a1c28f2; backdrop-filter: blur(16px); }
-      .channel-list.show { transform: translateX(0); }
-      .close-btn { display: block; }
-    }
-    .tv-mode .video-container { border-radius: 0; }
-
-    /* Fullskärms-nav */
-    .fs-nav { position: fixed; top: 50%; transform: translateY(-50%); z-index: 9999; display: none; flex-direction: column; align-items: center; gap: 6px; opacity: 1; transition: opacity 0.4s ease; pointer-events: auto; }
-    .fs-nav.hidden { opacity: 0; pointer-events: none; }
-    .fs-nav-prev { left: 18px; }
-    .fs-nav-next { right: 18px; }
-    :fullscreen .fs-nav, :-webkit-full-screen .fs-nav, :-moz-full-screen .fs-nav { display: flex; }
-    .fs-nav-btn { background: rgba(0,0,0,0.55); backdrop-filter: blur(8px); border: 2px solid rgba(78,204,163,0.6); color: #4ecca3; width: 52px; height: 52px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
-    .fs-nav-btn:hover { background: #4ecca3; color: #0a1c2a; transform: scale(1.1); }
-    .fs-nav-label { font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 20px; max-width: 90px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header h1 { font-size: 2.3em; color: #4ecca3; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .nav-buttons { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 12px 16px; background: rgba(0,0,0,0.25); }
+    .nav-btn { background: #1e2f3f; color: #e0e0e0; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; font-weight: 600; }
+    .nav-btn:hover, .nav-btn.active { background: #4ecca3; color: #0a1c2a; }
+    .container { display: flex; height: calc(100vh - 180px); padding: 16px; gap: 16px; }
+    .channel-list { width: 300px; background: rgba(0,0,0,0.45); border-radius: 22px; padding: 12px; overflow-y: auto; }
+    .video-container { flex: 1; background: #03090e; border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; }
+    .video-wrapper { flex: 1; background: #000; display: flex; align-items: center; justify-content: center; }
+    .channel-item { padding: 10px; margin: 6px 0; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.1); }
+    .channel-item:hover { background: rgba(78,204,163,0.3); }
+    .category-title { color: #4ecca3; font-weight: bold; padding: 10px 6px 5px; border-bottom: 2px solid #4ecca3; margin: 15px 0 8px; }
+    .popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; }
+    .popup-overlay.show { display: flex; }
+    .popup-browser { width: 90vw; height: 85vh; background: #08161f; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
   </style>
 </head>
 <body>
 
-<div class="fs-nav fs-nav-prev hidden" id="fs-prev">
-  <button class="fs-nav-btn" onclick="fsNavChannel(-1)">&#8592;</button>
-  <div class="fs-nav-label" id="fs-prev-label">Föregående</div>
-</div>
-<div class="fs-nav fs-nav-next hidden" id="fs-next">
-  <button class="fs-nav-btn" onclick="fsNavChannel(1)">&#8594;</button>
-  <div class="fs-nav-label" id="fs-next-label">Nästa</div>
-</div>
-
-<!-- ========== POPUP NOTICE ========== -->
-<div class="popup-notice" id="popup-notice" onclick="handleNoticeOverlay(event)">
-  <div class="popup-notice-box">
-    <div class="popup-notice-icon">📺</div>
-    <div class="popup-notice-title" id="pn-title">Öppna kanal</div>
-    <div class="popup-notice-sub">
-      Karwan.tv blockerar inbäddning i iframe. Kanalen öppnas i ett nytt webbläsarfönster.
-    </div>
-    <div class="popup-notice-btns">
-      <button class="popup-notice-open" id="pn-open-btn" onclick="doOpenPopupWindow()">🪟 Öppna fönster</button>
-      <button class="popup-notice-close" onclick="closeNotice()">✕ Avbryt</button>
-    </div>
-    <div class="popup-notice-url" id="pn-url"></div>
-  </div>
-</div>
-
 <div class="header">
   <h1>KURDISH · KARWAN · iFILM ✨</h1>
-  <p>Dra för att ändra ordning • Karwan-kanaler öppnas i nytt webbläsarfönster 🪟</p>
+  <p>Klicka på en kanal • Karwan öppnas i popup</p>
 </div>
 
 <div class="nav-buttons">
-  <button class="nav-btn active" onclick="showAll(this)">🎞 Alla</button>
-  <div class="dd-wrap">
-    <button class="nav-btn" id="btn-akhbar" onclick="toggleDD(event,'dd-akhbar')">📰 Akhbar ▾</button>
-    <div class="dropdown-menu" id="dd-akhbar">
-      <div class="dropdown-item" onclick="filterSub('akhbar','all')">📺 Alla Akhbar</div>
-      <div class="dropdown-item" onclick="filterSub('akhbar','news')">📡 Nyheter</div>
-    </div>
-  </div>
-  <button class="nav-btn" id="btn-musik" onclick="filterDirect(this,'musik')">🎵 Musik</button>
-  <button class="nav-btn" id="btn-minal" onclick="filterDirect(this,'minal')">🧒 Minal</button>
-  <button class="nav-btn" id="btn-film"  onclick="filterDirect(this,'film')">🎬 Film & Serie</button>
-  <button class="nav-btn" id="btn-dini"  onclick="filterDirect(this,'dini')">🕌 Dini</button>
-  <button class="nav-btn" id="btn-sport" onclick="filterDirect(this,'sport')">⚽ Sport</button>
-  <div class="dd-wrap">
-    <button class="nav-btn" id="btn-karwan" onclick="toggleDD(event,'dd-karwan')">⭐ Karwan TV ▾</button>
-    <div class="dropdown-menu" id="dd-karwan">
-      <div class="dropdown-item" onclick="filterSub('karwan','all')">📺 Alla Karwan</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','blue')">🧸 Kids</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','purple')">🎬 Movie</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','pink')">🎭 Dubbad</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','grey')">🌀 Blandad</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','yellow')">🎵 Music</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','maroon')">📽 Dokumentär</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','green')">🕌 Dini</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','brown')">🏛 Kultur</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','magenta')">🎶 Srodi Dini</div>
-      <div class="dropdown-item" onclick="filterSub('karwan','beige')">📰 Nyhet</div>
-    </div>
-  </div>
-  <button class="nav-btn" id="btn-ifilm" onclick="filterDirect(this,'ifilm')">🌍 iFilm</button>
+  <button class="nav-btn active" onclick="showAll(this)">Alla</button>
+  <button class="nav-btn" onclick="filterDirect(this,'akhbar')">📰 Akhbar</button>
+  <button class="nav-btn" onclick="filterDirect(this,'musik')">🎵 Musik</button>
+  <button class="nav-btn" onclick="filterDirect(this,'minal')">🧒 Minal</button>
+  <button class="nav-btn" onclick="filterDirect(this,'film')">🎬 Film</button>
+  <button class="nav-btn" onclick="filterDirect(this,'dini')">🕌 Dini</button>
+  <button class="nav-btn" onclick="filterDirect(this,'sport')">⚽ Sport</button>
+  <button class="nav-btn" onclick="filterDirect(this,'karwan')">⭐ Karwan TV</button>
+  <button class="nav-btn" onclick="filterDirect(this,'ifilm')">🌍 iFilm</button>
 </div>
 
 <div class="container">
   <aside class="channel-list" id="channel-list">
-    <button class="close-btn" onclick="toggleList()">✕ Stäng</button>
     <div id="ch-container"></div>
   </aside>
   <main class="video-container">
-    <div class="video-header">
-      <div>
-        <div class="video-title" id="ch-title">📡 Välj en kanal</div>
-        <div class="ua-selector">UA:
-          <select id="ua-select" onchange="if(cur) reload()">
-            <option value="">Auto (standard)</option>
-            <option value="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)">📱 iPhone</option>
-            <option value="Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X)">📲 iPad</option>
-            <option value="Mozilla/5.0 (Linux; Android 10)">🤖 Android</option>
-          </select>
-        </div>
-      </div>
-      <div class="video-controls">
-        <button class="btn" onclick="toggleList()">📺 Kanaler</button>
-        <button class="btn" onclick="pip()">⧉ PiP</button>
-        <button class="btn" onclick="fs()">⛶ Fullskärm</button>
-        <button class="btn" onclick="reload()">↻ Ladda om</button>
-        <button class="btn" id="tv-btn" onclick="toggleTV()">📺 TV-läge</button>
-        <button class="btn" id="jsToggleBtn" onclick="toggleJSengine()">⚙️ JS PÅ</button>
-      </div>
-    </div>
     <div class="video-wrapper" id="vwrap">
-      <div class="error-msg">
-        <h3>👈 Välj en kanal</h3>
-        <p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning<br>🪟 Karwan-kanaler öppnas i nytt webbläsarfönster</p>
+      <div class="error-msg" style="text-align:center; color:#aaa;">
+        <h3>Välj en kanal till vänster</h3>
       </div>
     </div>
   </main>
 </div>
 
+<!-- Popup -->
+<div class="popup-overlay" id="popup-overlay" onclick="handleOverlayClick(event)">
+  <div class="popup-browser" id="popup-browser">
+    <div style="background:#0c1e2c; padding:12px; text-align:center; font-weight:bold;" id="popup-title">Karwan Browser</div>
+    <div id="popup-iframe-wrap" style="flex:1; position:relative;">
+      <div id="popup-loading" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#030c13;">Laddar kanal...</div>
+      <iframe id="popup-iframe" style="width:100%; height:100%; border:none; display:none;" allowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+
 <script>
-// ========== KANALDATA ==========
-const akhbarRaw = [
-  { name:'Zagros',       url:'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', color:'green', subgroup:'news' },
-  { name:'MMN News',     url:'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8',                        color:'green', subgroup:'news' },
-  { name:'Kanal8',       url:'https://live.channel8.com/Channel8-Kurdish/index.fmp4.m3u8',                    color:'green', subgroup:'news' },
-  { name:'AVA1',         url:'https://ava1.store/upload/ava.m3u8',                                            color:'green', subgroup:'news' },
-  { name:'Rudaw',        url:'https://live.rudaw.net/hls/rudaw-tv/stream_1080p.m3u8',                         color:'green', subgroup:'news' },
-  { name:'Kurdsat News', url:'https://hlspackager.akamaized.net/live/DB/KURDSAT_NEWS/HLS/KURDSAT_NEWS.m3u8',  color:'green', subgroup:'news' },
-  { name:'NRT News',     url:'https://live20.bozztv.com/giatv/giatv-nrt/nrt/chunks.m3u8',                    color:'green', subgroup:'news' },
-  { name:'Rojava HD',    url:'https://hlspackager.akamaized.net/live/DB/ROJAVA_HD/HLS/ROJAVA_HD.m3u8',        color:'green', subgroup:'news' },
-  { name:'Kurdistan24',  url:'https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8',                  color:'green', subgroup:'news' },
-  { name:'GK',           url:'https://live.host247.net/gk/gksat/chunklist_w624411416.m3u8',                   color:'green', subgroup:'news' },
-  { name:'TRT Kurdî',    url:'https://tv-trtkurdi.medya.trt.com.tr/master_1440.m3u8',                         color:'green', subgroup:'news' },
-  { name:'Kirkuk',       url:'https://live.kirkuklive.live/hls/stream/index.m3u8',                            color:'green', subgroup:'news' },
-  { name:'Waar',         url:'https://live.kwikmotion.com/waarmedialive/waarmedia.smil/waarmediapublish/waarmedia_source/chunks.m3u8', color:'green', subgroup:'news' },
-  { name:'Kurdistan TV', url:'https://5a3ed7a72ed4b.streamlock.net/live/SMIL:myStream.smil/playlist.m3u8',    color:'green', subgroup:'news' },
-  { name:'Aryen TV',     url:'https://stream.aryen.tv/live/tv/playlist.m3u8',                                 color:'green', subgroup:'news' },
-  { name:'PDKI',         url:'https://kurdchhls.wns.live/hls/stream.m3u8',                                    color:'green', subgroup:'news' },
-  { name:'Komala',       url:'https://komhls.wns.live/hls/stream.m3u8',                                       color:'green', subgroup:'news' },
-  { name:'Payam TV',     url:'https://media2.streambrothers.com:1936/8218/8218/chunklist_w1239498607.m3u8',   color:'green', subgroup:'news' },
-  { name:'Ava TV',       url:'https://www.ava.news/livewatch',  method:'popup', color:'orange', subgroup:'news' },
-  { name:'Speda',        url:'https://www.speda.net/tv1/',       method:'popup', color:'orange', subgroup:'news' },
-];
-const musikRaw = [
-  { name:'4 Kurd',        url:'https://4kuhls.persiana.live/hls/stream.m3u8',                                              color:'yellow' },
-  { name:'MMN Clip',      url:'http://mmn.mypsx.net:1935/live/mmnhdclip/playlist.m3u8',                                   color:'yellow' },
-  { name:'Medmusik',      url:'http://54.36.110.140/live3/live3.m3u8',                                                    color:'yellow' },
-  { name:'KurdMax Music', url:'https://6476e46b58f91.streamlock.net/music/MUSIC2402/chunklist_w1890238732.m3u8',           color:'yellow' },
-  { name:'AZADI',         url:'https://karwan.tv/azadi-tv/', method:'popup', color:'yellow' },
-];
-const minalRaw = [
-  { name:'Kidco',          url:'http://avrstream.com:1935/live/kidcohd/tracks-v1a1/mono.m3u8',             color:'blue' },
-  { name:'Baxche',         url:'https://5dcabf026b188.streamlock.net/afarinTV/livestream/playlist.m3u8',   color:'blue' },
-  { name:'Afarin Kids',    url:'https://65f16f0fdfc51.streamlock.net/afarinTV/livestream/playlist.m3u8',   color:'blue' },
-  { name:'Zarok Kurmanci', url:'https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8',                  color:'blue' },
-  { name:'Zarok Sorani',   url:'https://zindisorani.zaroktv.com.tr/hls/stream.m3u8',                      color:'blue' },
-  { name:'MMN Kids',       url:'http://mmn.mypsx.net:1935/live/mmnhdkids/playlist.m3u8',                  color:'blue' },
-  { name:'Kurdmax Pepule', url:'https://karwan.tv/kurdmax-pepule', method:'popup', color:'blue' },
-  { name:'Jojo Mama',      url:'https://karwan.tv/jojo-mama',      method:'popup', color:'blue' },
-  { name:'Astera Baby',    url:'https://karwan.tv/astera-baby',    method:'popup', color:'blue' },
-  { name:'Znar Kids',      url:'https://karwan.tv/znar-kids',      method:'popup', color:'blue' },
-  { name:'Spi Kids',       url:'https://karwan.tv/spi-kids',       method:'popup', color:'blue' },
-];
-const filmRaw = [
-  { name:'Kurdsat HD',         url:'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8',         color:'purple' },
-  { name:'Befrin TV',          url:'https://cdn.karwan.tv/befrin-tv/index.m3u8',                                       color:'purple' },
-  { name:'KurdMax Show',       url:'https://6476e46b58f91.streamlock.net/liveTrans/SHOWS123/chunklist_w1636239261.m3u8',color:'purple' },
-  { name:'KurdMax Sorani',     url:'https://6476e46b58f91.streamlock.net/liveTrans/KURDB3388/chunklist_w1251224212.m3u8',color:'purple' },
-  { name:'KurdMax Kurmanci',   url:'https://6476e46b58f91.streamlock.net/liveTrans/KURDS2211/chunklist_w1417746539.m3u8',color:'purple' },
-  { name:'MixKurdy',           url:'https://avr.host247.net/live/Mix-kurdy/tracks-v1a1/mono.m3u8',                    color:'purple' },
-  { name:'MMN Drama',          url:'http://mmn.mypsx.net:1935/live/mmnhddrama/playlist.m3u8',                         color:'purple' },
-  { name:'MMN Movies',         url:'http://mmn.mypsx.net:1935/live/mmnhdmovies/playlist.m3u8',                        color:'purple' },
-  { name:'Avar TV',            url:'https://avr.host247.net/live/AvarTv/tracks-v1a1/mono.m3u8',                       color:'purple' },
-  { name:'Khak TV',            url:'http://bblserver.ddns.net:1935/stream/khakhd/playlist.m3u8',                      color:'purple' },
-  { name:'Cihan TV',           url:'https://karwan.tv/cihan-tv',              method:'popup', color:'pink' },
-  { name:'Speda Drama',        url:'https://karwan.tv/speda-drama',           method:'popup', color:'pink' },
-  { name:'UTV Hawler',         url:'https://karwan.tv/utv-hawler',            method:'popup', color:'pink' },
-  { name:'Astera Movies',      url:'https://karwan.tv/astera-movies',         method:'popup', color:'pink' },
-  { name:'Derwaze TV',         url:'https://karwan.tv/derwaze-tv',            method:'popup', color:'pink' },
-  { name:'Zed TV Plus',        url:'https://karwan.tv/zed-tv-plus',           method:'popup', color:'pink' },
-  { name:'Soran Entertainment',url:'https://karwan.tv/soran-entertainment-tv',method:'popup', color:'pink' },
-  { name:'Zed TV',             url:'https://karwan.tv/zed-tv',                method:'popup', color:'pink' },
-  { name:'Soz TV',             url:'https://karwan.tv/soz-tv',                method:'popup', color:'pink' },
-  { name:'Zaxo TV',            url:'https://karwan.tv/zaxo-tv',               method:'popup', color:'pink' },
-  { name:'Barin Family',       url:'https://karwan.tv/barin-family',          method:'popup', color:'pink' },
-  { name:'Barin Movies',       url:'https://karwan.tv/barin-movies',          method:'popup', color:'pink' },
-  { name:'Delal TV',           url:'https://karwan.tv/delal-tv',              method:'popup', color:'pink' },
-  { name:'Halabja TV',         url:'https://karwan.tv/halabja-tv',            method:'popup', color:'pink' },
-  { name:'Infinity TV',        url:'https://karwan.tv/infinity-tv',           method:'popup', color:'pink' },
-];
-const diniRaw = [
-  { name:'Amozhgary', url:'https://app-live.org/live/3268334b/index.m3u8',                color:'teal' },
-  { name:'MMN Quran',  url:'http://mmn.mypsx.net:1935/live/mmnhdquran/playlist.m3u8',    color:'teal' },
-  { name:'Eman TV',    url:'https://avr.host247.net/live/emantv/tracks-v1a1/mono.m3u8',  color:'teal' },
-  { name:'Spi Quran',  url:'https://karwan.tv/spi-quran',  method:'popup', color:'teal' },
-  { name:'UTV Duhok',  url:'https://karwan.tv/utv-duhok',  method:'popup', color:'teal' },
-  { name:'Baboly TV',  url:'https://karwan.tv/baboly-tv',  method:'popup', color:'teal' },
-];
-const sportRaw = [
-  { name:'MMN Sport',        url:'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8',       color:'red' },
-  { name:'MMN Documentary',  url:'http://mmn.mypsx.net:1935/live/mmnhddocumentary/playlist.m3u8', color:'red' },
-  { name:'Astera Culture',   url:'https://karwan.tv/astera-culture',   method:'popup', color:'red' },
-  { name:'Reng Documentary', url:'https://karwan.tv/reng-documentary', method:'popup', color:'red' },
-  { name:'Znar TV',          url:'https://karwan.tv/znar-tv',          method:'popup', color:'red' },
-  { name:'Zhyar TV',         url:'https://karwan.tv/zhyar-tv',         method:'popup', color:'red' },
-  { name:'Animal Box',       url:'https://karwan.tv/animal-box',       method:'popup', color:'red' },
-  { name:'Bask TV',          url:'https://karwan.tv/bask-tv',          method:'popup', color:'red' },
-  { name:'Srusht TV',        url:'https://karwan.tv/srusht-tv',        method:'popup', color:'red' },
-  { name:'Spi TV',           url:'https://karwan.tv/spi-tv',           method:'popup', color:'red' },
-  { name:'Cira TV',          url:'https://karwan.tv/cira-tv',          method:'popup', color:'red' },
-  { name:'Dever TV',         url:'https://karwan.tv/dever-tv',         method:'popup', color:'red' },
-  { name:'Dimen TV',         url:'https://karwan.tv/dimen-tv',         method:'popup', color:'red' },
-  { name:'Kurdana TV',       url:'https://karwan.tv/kurdana-tv',       method:'popup', color:'red' },
-];
-const karwanRaw = [
-  { name:'Kidco TV',           url:'https://karwan.tv/kidco-tv',               method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'MMN Kids',           url:'https://karwan.tv/mmn-kids',               method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'NRT 3 Kids',         url:'https://karwan.tv/nrt-3-kids',             method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'Kurdmax Pepule',     url:'https://karwan.tv/kurdmax-pepule',         method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'Jojo Mama',          url:'https://karwan.tv/jojo-mama',              method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'Astera Baby',        url:'https://karwan.tv/astera-baby',            method:'popup', color:'blue',    subgroup:'blue' },
-  { name:'MMN Movies',         url:'https://karwan.tv/mmn-movies',             method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Soran Entertain.',   url:'https://karwan.tv/soran-entertainment-tv', method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Bnar Movies',        url:'https://karwan.tv/bnar-movies',            method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Bnar TV',            url:'https://karwan.tv/bnar-tv',                method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Befrin TV',          url:'https://karwan.tv/befrin-tv',              method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Jamawar TV',         url:'https://karwan.tv/jamawar-tv',             method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Barin Movies',       url:'https://karwan.tv/barin-movies',           method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Astera Movies',      url:'https://karwan.tv/astera-movies',          method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Derwaze TV',         url:'https://karwan.tv/derwaze-tv',             method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'Bnar Action',        url:'https://karwan.tv/bnar-action',            method:'popup', color:'purple',  subgroup:'purple' },
-  { name:'MMN Drama',          url:'https://karwan.tv/mmn-drama',              method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'MMN Show',           url:'https://karwan.tv/mmn-show',               method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Astera Show',        url:'https://karwan.tv/astera-show',            method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Infinity TV',        url:'https://karwan.tv/infinity-tv',            method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Astera Family',      url:'https://karwan.tv/astera-family',          method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Barin Family',       url:'https://karwan.tv/barin-family',           method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Srusht TV',          url:'https://karwan.tv/srusht-tv',              method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Avar TV',            url:'https://karwan.tv/avar-tv',                method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Halabja TV',         url:'https://karwan.tv/halabja-tv',             method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Rozh TV',            url:'https://karwan.tv/rozh-tv',                method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Speda Drama',        url:'https://karwan.tv/speda-drama',            method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Delal TV',           url:'https://karwan.tv/delal-tv',               method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Kurdmax TV',         url:'https://karwan.tv/kurdmax-tv',             method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Zaxo TV',            url:'https://karwan.tv/zaxo-tv',                method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Kurdmax Show',       url:'https://karwan.tv/kurdmax-show-tv',        method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Mix TV',             url:'https://karwan.tv/mix-tv',                 method:'popup', color:'pink',    subgroup:'pink' },
-  { name:'Karwan Duhok',       url:'https://karwan.tv/duhok-tv',               method:'popup', color:'grey',    subgroup:'grey' },
-  { name:'Cihan TV',           url:'https://karwan.tv/cihan-tv',               method:'popup', color:'grey',    subgroup:'grey' },
-  { name:'Khak TV',            url:'https://karwan.tv/khak-tv',                method:'popup', color:'grey',    subgroup:'grey' },
-  { name:'Zed TV Plus',        url:'https://karwan.tv/zed-tv-plus',            method:'popup', color:'grey',    subgroup:'grey' },
-  { name:'Karwan Slemani',     url:'https://karwan.tv/slemani-tv',             method:'popup', color:'grey',    subgroup:'grey' },
-  { name:'Sima TV',            url:'https://karwan.tv/sima-tv',                method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Shna TV',            url:'https://karwan.tv/shna-tv',                method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Kurd 7',             url:'https://karwan.tv/kurd-7',                 method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Kurdmax Music',      url:'https://karwan.tv/kurdmax-music',          method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'MMN Clip',           url:'https://karwan.tv/mmn-clip',               method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Astera Culture',     url:'https://karwan.tv/astera-culture',         method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Derin TV',           url:'https://karwan.tv/derin-tv',               method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Reng TV',            url:'https://karwan.tv/reng-tv',                method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Euro Kurd TV',       url:'https://karwan.tv/euro-kurd-tv',           method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Kurdana TV',         url:'https://karwan.tv/kurdana-tv',             method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Azadi TV',           url:'https://karwan.tv/azadi-tv',               method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'Kanal 21',           url:'https://karwan.tv/kanali-21',              method:'popup', color:'yellow',  subgroup:'yellow' },
-  { name:'MMN Documentary',    url:'https://karwan.tv/mmn-documentary',        method:'popup', color:'maroon',  subgroup:'maroon' },
-  { name:'Astera Documentary', url:'https://karwan.tv/astera-documentary',     method:'popup', color:'maroon',  subgroup:'maroon' },
-  { name:'Reng Documentary',   url:'https://karwan.tv/reng-documentary',       method:'popup', color:'maroon',  subgroup:'maroon' },
-  { name:'Zed TV',             url:'https://karwan.tv/zed-tv',                 method:'popup', color:'maroon',  subgroup:'maroon' },
-  { name:'NRT 4',              url:'https://karwan.tv/nrt-4',                  method:'popup', color:'green',   subgroup:'green' },
-  { name:'Mihrab TV',          url:'https://karwan.tv/mihrab-tv',              method:'popup', color:'green',   subgroup:'green' },
-  { name:'UTV Duhok',          url:'https://karwan.tv/utv-duhok',              method:'popup', color:'green',   subgroup:'green' },
-  { name:'UTV Hawler',         url:'https://karwan.tv/utv-hawler',             method:'popup', color:'green',   subgroup:'green' },
-  { name:'Shar TV',            url:'https://karwan.tv/shar-tv',                method:'popup', color:'green',   subgroup:'green' },
-  { name:'Farmoda TV',         url:'https://karwan.tv/farmoda-tv',             method:'popup', color:'green',   subgroup:'green' },
-  { name:'Ranya TV',           url:'https://karwan.tv/ranya-tv',               method:'popup', color:'green',   subgroup:'green' },
-  { name:'Aro Family',         url:'https://karwan.tv/aro-family',             method:'popup', color:'green',   subgroup:'green' },
-  { name:'Dever TV',           url:'https://karwan.tv/dever-tv',               method:'popup', color:'brown',   subgroup:'brown' },
-  { name:'Rasan TV',           url:'https://karwan.tv/rasan-tv',               method:'popup', color:'brown',   subgroup:'brown' },
-  { name:'Dimen TV',           url:'https://karwan.tv/dimen-tv',               method:'popup', color:'magenta', subgroup:'magenta' },
-  { name:'Bangxwazen Badinan', url:'https://karwan.tv/bangxwazen-badinan-tv',  method:'popup', color:'magenta', subgroup:'magenta' },
-  { name:'Esra TV',            url:'https://karwan.tv/esra-tv',                method:'popup', color:'magenta', subgroup:'magenta' },
-  { name:'Kurd Channel',       url:'https://karwan.tv/kurd-channel',           method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Cira TV',            url:'https://karwan.tv/cira-tv',                method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Karwan Nalia TV',    url:'https://karwan.tv/nalia-tv',               method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Rojhelat TV',        url:'https://karwan.tv/rojhelat-tv',            method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Speda TV',           url:'https://karwan.tv/speda-tv',               method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Kirkuk TV',          url:'https://karwan.tv/kirkuk-tv',              method:'popup', color:'beige',   subgroup:'beige' },
-  { name:'Ava TV',             url:'https://karwan.tv/ava-tv',                 method:'popup', color:'beige',   subgroup:'beige' },
-];
-const ifilmRaw = [
-  { name:'iFilm Farsi',   url:'https://live.presstv.ir/hls/ifilmfa.m3u8', color:'cyan' },
-  { name:'iFilm Dari',    url:'https://live.presstv.ir/hls/ifilm2.m3u8',  color:'cyan' },
-  { name:'iFilm English', url:'https://live.presstv.ir/hls/ifilmen.m3u8', color:'cyan' },
-  { name:'iFilm Arabic',  url:'https://live.presstv.ir/hls/ifilmar.m3u8', color:'cyan' },
-];
-
-// ===== Ordning =====
-function loadOrder(k){try{const o=localStorage.getItem('order_'+k);return o?JSON.parse(o):null;}catch(e){return null;}}
-function saveOrder(k,a){localStorage.setItem('order_'+k,JSON.stringify(a.map(c=>c.url)));}
-function applyOrder(arr,k){const s=loadOrder(k);if(!s||!s.length)return arr;const m=new Map(arr.map(c=>[c.url,c]));const o=[];for(let u of s)if(m.has(u))o.push(m.get(u));for(let c of arr)if(!o.includes(c))o.push(c);return o;}
-const channels={
-  akhbar:applyOrder([...akhbarRaw],'akhbar'),musik:applyOrder([...musikRaw],'musik'),
-  minal:applyOrder([...minalRaw],'minal'),film:applyOrder([...filmRaw],'film'),
-  dini:applyOrder([...diniRaw],'dini'),sport:applyOrder([...sportRaw],'sport'),
-  karwan:applyOrder([...karwanRaw],'karwan'),ifilm:applyOrder([...ifilmRaw],'ifilm'),
+// ==================== KANALDATA ====================
+const channels = {
+  akhbar: [
+    { name:'Zagros', url:'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8' },
+    { name:'Rudaw', url:'https://live.rudaw.net/hls/rudaw-tv/stream_1080p.m3u8' },
+    { name:'Kurdistan24', url:'https://d1x82nydcxndze.cloudfront.net/live/index_720p25.m3u8' },
+    { name:'NRT News', url:'https://live20.bozztv.com/giatv/giatv-nrt/nrt/chunks.m3u8' },
+    { name:'KurdSat News', url:'https://hlspackager.akamaized.net/live/DB/KURDSAT_NEWS/HLS/KURDSAT_NEWS.m3u8' }
+  ],
+  musik: [
+    { name:'KurdMax Music', url:'https://6476e46b58f91.streamlock.net/music/MUSIC2402/chunklist_w1890238732.m3u8' },
+    { name:'4 Kurd', url:'https://4kuhls.persiana.live/hls/stream.m3u8' }
+  ],
+  minal: [
+    { name:'Kidco', url:'http://avrstream.com:1935/live/kidcohd/tracks-v1a1/mono.m3u8' },
+    { name:'Zarok Kurmanci', url:'https://zindikurmanci.zaroktv.com.tr/hls/0/stream.m3u8' }
+  ],
+  film: [
+    { name:'Kurdsat HD', url:'https://hlspackager.akamaized.net/live/DB/KURDSAT_HD/HLS/KURDSAT_HD.m3u8' },
+    { name:'KurdMax Sorani', url:'https://6476e46b58f91.streamlock.net/liveTrans/KURDB3388/chunklist_w1251224212.m3u8' }
+  ],
+  dini: [
+    { name:'MMN Quran', url:'http://mmn.mypsx.net:1935/live/mmnhdquran/playlist.m3u8' }
+  ],
+  sport: [
+    { name:'MMN Sport', url:'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8' }
+  ],
+  karwan: [
+    { name:'Cihan TV', url:'https://karwan.tv/cihan-tv', method:'popup' },
+    { name:'Zaxo TV', url:'https://karwan.tv/zaxo-tv', method:'popup' },
+    { name:'Speda Drama', url:'https://karwan.tv/speda-drama', method:'popup' },
+    { name:'Kurdmax TV', url:'https://karwan.tv/kurdmax-tv', method:'popup' },
+    { name:'Astera Movies', url:'https://karwan.tv/astera-movies', method:'popup' }
+  ],
+  ifilm: [
+    { name:'iFilm Farsi', url:'https://live.presstv.ir/hls/ifilmfa.m3u8' }
+  ]
 };
-function reorderCategory(cat,arr){channels[cat]=arr;saveOrder(cat,arr);}
 
-// ===== State =====
-let hlsInst=null,dashInst=null,cur=null,favs=[],jsEnabled=true,tvMode=false;
-let stallTimer=null,lastTime=-1,dragSource=null,curFilter=null,curSub='all';
-let pendingPopupUrl='',pendingPopupName='';
-try{favs=JSON.parse(localStorage.getItem('xomfavs')||'[]');}catch(e){favs=[];}
+// ==================== POPUP FIX ====================
+let popUrl = '';
 
-function isTV(){const ua=navigator.userAgent||'';return /SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua)||(window.innerWidth>=1920&&!('ontouchstart' in window)&&navigator.maxTouchPoints===0);}
-function getHlsCfg(ref){const tv=isTV()||tvMode;return{enableWorker:true,startPosition:-1,lowLatencyMode:false,maxBufferLength:tv?40:10,maxMaxBufferLength:tv?120:30,maxBufferSize:tv?120e6:60e6,maxBufferHole:tv?1:0.5,liveSyncDurationCount:tv?5:3,liveMaxLatencyDurationCount:tv?10:6,fragLoadingMaxRetry:tv?8:4,fragLoadingRetryDelay:tv?1500:1000,fragLoadingMaxRetryTimeout:tv?16000:8000,manifestLoadingMaxRetry:tv?6:3,manifestLoadingRetryDelay:tv?1500:1000,levelLoadingMaxRetry:tv?6:3,levelLoadingRetryDelay:tv?1500:1000,startLevel:tv?0:-1,autoStartOnStall:true,xhrSetup(x){const ua=document.getElementById('ua-select').value;if(ua)try{x.setRequestHeader('User-Agent',ua);}catch(e){}if(ref)try{x.setRequestHeader('Referer',ref);}catch(e){}}};}
-function startStall(v){clearStall();lastTime=-1;stallTimer=setInterval(()=>{if(!v||v.paused||v.ended||v.readyState<2)return;const t=v.currentTime;if(t===lastTime&&v.readyState<4){if(hlsInst){try{const r=v.buffered;if(r.length>0){const e=r.end(r.length-1);if(e-t>2)v.currentTime=e-1.5;}hlsInst.startLoad();}catch(e){}v.play().catch(()=>{});}}lastTime=t;},5000);}
-function clearStall(){if(stallTimer){clearInterval(stallTimer);stallTimer=null;}}
-function destroyP(){clearStall();if(hlsInst){hlsInst.destroy();hlsInst=null;}if(dashInst){dashInst.reset();dashInst=null;}}
+function openPopup(url, name) {
+  popUrl = url;
+  document.getElementById('popup-title').textContent = name;
+  document.getElementById('popup-overlay').classList.add('show');
+  document.getElementById('popup-loading').style.display = 'flex';
+  const iframe = document.getElementById('popup-iframe');
+  iframe.style.display = 'none';
+  iframe.src = url;
 
-// ===== Render =====
-const catL={akhbar:'📰 Akhbar',musik:'🎵 Musik',minal:'🧒 Minal',film:'🎬 Film & Serie',dini:'🕌 Dini',sport:'⚽ Sport',karwan:'⭐ Karwan TV',ifilm:'🌍 iFilm'};
-const karwanSub={all:'Alla',blue:'Kids',purple:'Movie',pink:'Dubbad',grey:'Blandad',yellow:'Music',maroon:'Dokumentär',green:'Dini',brown:'Kultur',magenta:'Srodi Dini',beige:'Nyhet'};
-function esc(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
-
-function row(ch,idx,cat){
-  const m=ch.method||'hls';
-  const badge=m==='popup'?' <span class="tag">🪟</span>':m==='dash'?' <span class="tag">DASH</span>':'';
-  const star=favs.some(f=>f.url===ch.url)?'⭐':'☆';
-  const ac=(cur&&cur.url===ch.url)?'active':'';
-  return `<div class="channel-item ${ch.color} ${ac}" draggable="true" data-url="${esc(ch.url)}" data-name="${esc(ch.name)}" data-method="${m}" data-referer="${ch.referer||''}" data-cat="${cat}" data-idx="${idx}">
-    <span>${ch.name}${badge}</span>
-    <button class="fav-btn" onclick="event.stopPropagation();fav('${esc(ch.url)}','${esc(ch.name)}')">${star}</button>
-  </div>`;
+  iframe.onload = () => {
+    document.getElementById('popup-loading').style.display = 'none';
+    iframe.style.display = 'block';
+  };
 }
 
-function render(filter,sub){
-  curFilter=filter;curSub=sub||'all';let html='';
-  if(filter==='karwan'){const list=curSub==='all'?channels.karwan:channels.karwan.filter(c=>c.subgroup===curSub);html=`<div class="category-title">${catL.karwan} — ${karwanSub[curSub]} (${list.length})</div>`+list.map((ch,i)=>row(ch,i,'karwan')).join('');}
-  else if(filter&&channels[filter]){html=`<div class="category-title">${catL[filter]} (${channels[filter].length})</div>`+channels[filter].map((ch,i)=>row(ch,i,filter)).join('');}
-  else{Object.keys(channels).forEach(cat=>{html+=`<div class="category-title">${catL[cat]}</div>`+channels[cat].map((ch,i)=>row(ch,i,cat)).join('');});}
-  document.getElementById('ch-container').innerHTML=html;
-  attachDrag();attachClick();
-}
-function attachClick(){document.querySelectorAll('.channel-item').forEach(el=>{el.addEventListener('click',function(ev){if(ev.target.classList.contains('fav-btn'))return;play(this.dataset.url,this.dataset.name,this.dataset.method,this.dataset.referer);});});}
-
-// ===== Drag =====
-function attachDrag(){document.querySelectorAll('.channel-item[draggable="true"]').forEach(el=>{el.addEventListener('dragstart',dStart);el.addEventListener('dragend',dEnd);el.addEventListener('dragover',dOver);el.addEventListener('dragleave',dLeave);el.addEventListener('drop',dDrop);});}
-function dStart(e){dragSource=e.target.closest('.channel-item');if(!dragSource)return;e.dataTransfer.setData('text/plain','d');e.dataTransfer.effectAllowed='move';dragSource.style.opacity='0.5';}
-function dEnd(){if(dragSource)dragSource.style.opacity='';document.querySelectorAll('.channel-item').forEach(el=>el.classList.remove('drag-over'));dragSource=null;}
-function dOver(e){e.preventDefault();const t=e.target.closest('.channel-item');if(t&&t!==dragSource)t.classList.add('drag-over');}
-function dLeave(e){const t=e.target.closest('.channel-item');if(t)t.classList.remove('drag-over');}
-function dDrop(e){
-  e.preventDefault();const tgt=e.target.closest('.channel-item');
-  if(!dragSource||!tgt||dragSource===tgt){dClean();return;}
-  const sc=dragSource.dataset.cat,tc=tgt.dataset.cat;if(sc!==tc){dClean();return;}
-  const si=parseInt(dragSource.dataset.idx),ti=parseInt(tgt.dataset.idx);if(isNaN(si)||isNaN(ti)){dClean();return;}
-  const arr=[...channels[sc]];const[m]=arr.splice(si,1);arr.splice(ti,0,m);reorderCategory(sc,arr);render(curFilter,curSub);dClean();
-}
-function dClean(){if(dragSource)dragSource.style.opacity='';document.querySelectorAll('.channel-item').forEach(el=>el.classList.remove('drag-over'));dragSource=null;}
-
-// ===== POPUP WINDOW (window.open) =====
-let popupWin = null;
-
-function openPopupWindow(url, name) {
-  pendingPopupUrl = url;
-  pendingPopupName = name;
-
-  // Visa bekräftelsedialogens kanalnamn och url
-  document.getElementById('pn-title').textContent = '📺 ' + name;
-  document.getElementById('pn-url').textContent = url;
-  document.getElementById('popup-notice').classList.add('show');
+function handleOverlayClick(e) {
+  if (e.target.id === 'popup-overlay') document.getElementById('popup-overlay').classList.remove('show');
 }
 
-function doOpenPopupWindow() {
-  closeNotice();
-  const url = pendingPopupUrl;
-  const name = pendingPopupName;
+function closePopup() {
+  document.getElementById('popup-overlay').classList.remove('show');
+}
 
-  // Beräkna fönsterstorlek: 85% av skärmen, centrerat
-  const w = Math.min(1280, Math.round(screen.width * 0.85));
-  const h = Math.min(800,  Math.round(screen.height * 0.85));
-  const left = Math.round((screen.width  - w) / 2);
-  const top  = Math.round((screen.height - h) / 2);
+// ==================== RENDER ====================
+function render() {
+  let html = '';
+  Object.keys(channels).forEach(cat => {
+    html += `<div class="category-title">${cat.toUpperCase()}</div>`;
+    channels[cat].forEach(ch => {
+      const isPopup = ch.method === 'popup' ? ' <span style="font-size:10px;">🪟</span>' : '';
+      html += `
+        <div class="channel-item" onclick="play('${ch.url}', '${ch.name}', '${ch.method || "hls"}')">
+          ${ch.name}${isPopup}
+        </div>`;
+    });
+  });
+  document.getElementById('ch-container').innerHTML = html;
+}
 
-  const features = `width=${w},height=${h},left=${left},top=${top},toolbar=yes,menubar=yes,scrollbars=yes,resizable=yes,location=yes,status=yes`;
-
-  // Stäng gammalt popup-fönster om det fortfarande är öppet
-  if (popupWin && !popupWin.closed) {
-    popupWin.location.href = url;
-    popupWin.focus();
+function play(url, name, method) {
+  if (method === 'popup') {
+    openPopup(url, name);
   } else {
-    popupWin = window.open(url, 'karwan_popup', features);
-    if (!popupWin) {
-      // Popup blockerades av webbläsaren — öppna i ny flik istället
-      window.open(url, '_blank');
-    } else {
-      popupWin.focus();
-    }
+    alert('HLS-spelare skulle startas här\nURL: ' + url);
+    // Lägg till din vanliga HLS-kod här om du vill
   }
 }
 
-function closeNotice() {
-  document.getElementById('popup-notice').classList.remove('show');
+function showAll() { render(); }
+function filterDirect(btn, cat) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  let html = `<div class="category-title">${cat.toUpperCase()}</div>`;
+  channels[cat].forEach(ch => {
+    html += `<div class="channel-item" onclick="play('${ch.url}', '${ch.name}', '${ch.method || "hls"}')">${ch.name}</div>`;
+  });
+  document.getElementById('ch-container').innerHTML = html;
 }
 
-function handleNoticeOverlay(e) {
-  if (e.target === document.getElementById('popup-notice')) closeNotice();
-}
-
-// ===== Play =====
-function play(url,name,method,referer){
-  if(window.innerWidth<=768)document.getElementById('channel-list').classList.remove('show');
-  cur={url,name,method,referer};
-  document.getElementById('ch-title').textContent=name;
-  setTimeout(()=>{if(typeof updateFsL==='function')updateFsL();},50);
-
-  if(method==='popup'){
-    destroyP();
-    openPopupWindow(url, name);
-    render(curFilter,curSub);
-    return;
-  }
-
-  closeNotice();
-  destroyP();
-  const wrap=document.getElementById('vwrap');
-
-  if(!jsEnabled){
-    wrap.innerHTML='<video id="vp" controls autoplay style="width:100%;height:100%;"></video>';
-    const v=document.getElementById('vp');v.src=url;v.play().catch(()=>{wrap.innerHTML=`<div class="error-msg"><h3>⚠️ JS AV</h3><button class="btn" onclick="reload()">↻</button></div>`;});
-    render(curFilter,curSub);return;
-  }
-  wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;"><div class="spinner"></div><span>Laddar ${name}…</span></div>`;
-  setTimeout(()=>{
-    wrap.innerHTML='<video id="vp" controls autoplay style="width:100%;height:100%;"></video>';
-    const v=document.getElementById('vp');
-    if(Hls.isSupported()){
-      hlsInst=new Hls(getHlsCfg(referer));
-      hlsInst.loadSource(url);hlsInst.attachMedia(v);
-      hlsInst.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(e=>console.warn(e));startStall(v);});
-      hlsInst.on(Hls.Events.ERROR,(_,d)=>{if(!d.fatal)return;if(d.type===Hls.ErrorTypes.NETWORK_ERROR)setTimeout(()=>{if(hlsInst)hlsInst.startLoad();},(isTV()||tvMode)?3000:2000);else if(d.type===Hls.ErrorTypes.MEDIA_ERROR)hlsInst.recoverMediaError();else showErr();});
-    } else if(v.canPlayType('application/vnd.apple.mpegurl')){
-      v.src=url;v.play().catch(()=>showErr());startStall(v);
-    } else showErr();
-    render(curFilter,curSub);
-  },50);
-}
-
-function showErr(){document.getElementById('vwrap').innerHTML=`<div class="error-msg"><h3>⚠️ Kunde inte ladda stream</h3><button class="btn" onclick="reload()">↻ Försök igen</button></div>`;}
-function reload(){if(cur)play(cur.url,cur.name,cur.method,cur.referer);}
-function pip(){const v=document.getElementById('vp');if(v&&document.pictureInPictureEnabled){document.pictureInPictureElement?document.exitPictureInPicture():v.requestPictureInPicture().catch(()=>{});}}
-function fs(){const w=document.getElementById('vwrap');document.fullscreenElement?document.exitFullscreen():w.requestFullscreen().catch(()=>{});}
-function toggleTV(){tvMode=!tvMode;document.body.classList.toggle('tv-mode',tvMode);document.getElementById('tv-btn').textContent=tvMode?'🖥️ Normal':'📺 TV-läge';if(tvMode&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(document.fullscreenElement)document.exitFullscreen();localStorage.setItem('xomtv',tvMode?'1':'');if(cur)reload();}
-function toggleJSengine(){jsEnabled=!jsEnabled;const b=document.getElementById('jsToggleBtn');b.textContent=jsEnabled?'⚙️ JS PÅ':'⚠️ JS AV';b.classList.toggle('js-toggle-off',!jsEnabled);if(cur)play(cur.url,cur.name,cur.method,cur.referer);else document.getElementById('vwrap').innerHTML=`<div class="error-msg"><h3>🔘 JS ${jsEnabled?'PÅ':'AV'}</h3></div>`;localStorage.setItem('xom_js_toggle',jsEnabled?'on':'off');}
-function fav(url,name){const i=favs.findIndex(f=>f.url===url);i>-1?favs.splice(i,1):favs.push({url,name});localStorage.setItem('xomfavs',JSON.stringify(favs));render(curFilter,curSub);}
-function toggleList(){document.getElementById('channel-list').classList.toggle('show');}
-
-// ===== Nav =====
-let openDD=null;
-function closeAllDD(){document.querySelectorAll('.dropdown-menu').forEach(d=>d.classList.remove('show'));openDD=null;document.removeEventListener('click',outsideDD);}
-function outsideDD(ev){if(!ev.target.closest('.dd-wrap'))closeAllDD();}
-function setActiveBtn(b){document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));if(b)b.classList.add('active');}
-function showAll(b){setActiveBtn(b);closeAllDD();render(null,'all');}
-function filterDirect(b,cat){setActiveBtn(b);closeAllDD();render(cat,'all');}
-function filterSub(cat,sub){setActiveBtn(document.getElementById('btn-'+cat));closeAllDD();render(cat,sub);}
-function toggleDD(ev,id){ev.stopPropagation();const d=document.getElementById(id);const o=d.classList.contains('show');closeAllDD();if(!o){d.classList.add('show');openDD=id;setTimeout(()=>document.addEventListener('click',outsideDD),10);}}
-
-// ===== Init =====
-(function(){
-  try{const s=localStorage.getItem('xom_js_toggle');jsEnabled=s!=='off';const b=document.getElementById('jsToggleBtn');b.textContent=jsEnabled?'⚙️ JS PÅ':'⚠️ JS AV';b.classList.toggle('js-toggle-off',!jsEnabled);}catch(e){}
-  const ua=navigator.userAgent||'';
-  if(/SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua)||(window.innerWidth>=1920&&!('ontouchstart' in window)&&navigator.maxTouchPoints===0)||localStorage.getItem('xomtv')==='1'){document.body.classList.add('tv-mode');tvMode=true;document.getElementById('tv-btn').textContent='🖥️ Normal';}
-})();
-
-render(null,'all');
-
-// ===== Fullskärms-nav =====
-let fsHT=null;
-function getAllChs(){if(curFilter&&channels[curFilter]){if(curFilter==='karwan'&&curSub!=='all')return channels.karwan.filter(c=>c.subgroup===curSub);return channels[curFilter];}return Object.values(channels).flat();}
-function fsNavChannel(d){if(!cur)return;const l=getAllChs();const i=l.findIndex(c=>c.url===cur.url);if(i===-1)return;const n=l[(i+d+l.length)%l.length];if(n)play(n.url,n.name,n.method||'hls',n.referer||'');}
-function updateFsL(){if(!cur)return;const l=getAllChs();const i=l.findIndex(c=>c.url===cur.url);if(i===-1)return;document.getElementById('fs-prev-label').textContent=l[(i-1+l.length)%l.length]?.name||'';document.getElementById('fs-next-label').textContent=l[(i+1)%l.length]?.name||'';}
-function showFsNav(){if(!document.fullscreenElement)return;document.getElementById('fs-prev').classList.remove('hidden');document.getElementById('fs-next').classList.remove('hidden');clearTimeout(fsHT);fsHT=setTimeout(()=>{document.getElementById('fs-prev').classList.add('hidden');document.getElementById('fs-next').classList.add('hidden');},3000);}
-document.addEventListener('mousemove',showFsNav);document.addEventListener('touchstart',showFsNav);
-document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){document.getElementById('fs-prev').classList.add('hidden');document.getElementById('fs-next').classList.add('hidden');clearTimeout(fsHT);}else{updateFsL();showFsNav();}});
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('popup-notice').classList.contains('show')){closeNotice();return;}
-  if(!document.fullscreenElement)return;
-  if(e.key==='ArrowLeft'){fsNavChannel(-1);showFsNav();}
-  if(e.key==='ArrowRight'){fsNavChannel(1);showFsNav();}
-});
+// Start
+render();
 </script>
 </body>
 </html>
