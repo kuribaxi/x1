@@ -62,36 +62,40 @@
     .close-btn { display: none; position: fixed; top: 18px; right: 18px; z-index: 1001; background: #dc3545; color: white; border: none; padding: 9px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; }
     .js-toggle-off { background: #c95a2e !important; box-shadow: 0 0 8px #ff884d; }
 
-    /* ========== POPUP NOTICE (ersätter iframe-popup) ========== */
-    .popup-notice {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(10px);
-      z-index: 9000;
-      display: none; align-items: center; justify-content: center;
+    /* ========== IFRAME OVERLAY (visas ovanpå spelaren) ========== */
+    .iframe-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      background: #000;
     }
-    .popup-notice.show { display: flex; }
-    .popup-notice-box {
-      background: #0c1e2c;
-      border: 1px solid #4ecca355;
-      border-radius: 22px;
-      padding: 36px 40px;
-      max-width: 440px;
-      width: 90vw;
-      text-align: center;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.8);
-      animation: popIn 0.22s cubic-bezier(0.34,1.4,0.64,1);
+    .iframe-overlay.show { display: flex; }
+    .iframe-overlay iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
     }
-    @keyframes popIn { from { transform: scale(0.88) translateY(20px); opacity:0; } to { transform: scale(1) translateY(0); opacity:1; } }
-    .popup-notice-icon { font-size: 3rem; margin-bottom: 12px; }
-    .popup-notice-title { font-size: 1.25rem; font-weight: 700; color: #4ecca3; margin-bottom: 8px; }
-    .popup-notice-sub { font-size: 0.85rem; color: #8ab8a8; line-height: 1.6; margin-bottom: 22px; }
-    .popup-notice-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .popup-notice-open { background: #4ecca3; color: #0a1c2a; border: none; padding: 10px 24px; border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 0.9rem; transition: 0.2s; }
-    .popup-notice-open:hover { background: #3db891; transform: translateY(-2px); }
-    .popup-notice-close { background: #1f3e48; color: #ccc; border: none; padding: 10px 20px; border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 0.88rem; transition: 0.2s; }
-    .popup-notice-close:hover { background: #2e5a6a; }
-    .popup-notice-url { font-size: 0.72rem; color: #4a7a6a; margin-top: 14px; word-break: break-all; }
+    .iframe-bar {
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 14px;
+      gap: 10px;
+      border-bottom: 1px solid #4ecca355;
+      flex-shrink: 0;
+    }
+    .iframe-bar-title { font-size: 0.9rem; font-weight: 600; color: #4ecca3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .iframe-bar-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .iframe-close-btn { background: #dc3545; color: white; border: none; padding: 5px 14px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
+    .iframe-close-btn:hover { background: #c82333; }
+    .iframe-open-btn { background: #1f3e48; color: white; border: none; padding: 5px 14px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
+    .iframe-open-btn:hover { background: #4ecca3; color: #0a1c2a; }
 
     @media (max-width: 768px) {
       .container { flex-direction: column; height: auto; }
@@ -123,25 +127,9 @@
   <div class="fs-nav-label" id="fs-next-label">Nästa</div>
 </div>
 
-<!-- ========== POPUP NOTICE ========== -->
-<div class="popup-notice" id="popup-notice" onclick="handleNoticeOverlay(event)">
-  <div class="popup-notice-box">
-    <div class="popup-notice-icon">📺</div>
-    <div class="popup-notice-title" id="pn-title">Öppna kanal</div>
-    <div class="popup-notice-sub">
-      Karwan.tv blockerar inbäddning i iframe. Kanalen öppnas i ett nytt webbläsarfönster.
-    </div>
-    <div class="popup-notice-btns">
-      <button class="popup-notice-open" id="pn-open-btn" onclick="doOpenPopupWindow()">🪟 Öppna fönster</button>
-      <button class="popup-notice-close" onclick="closeNotice()">✕ Avbryt</button>
-    </div>
-    <div class="popup-notice-url" id="pn-url"></div>
-  </div>
-</div>
-
 <div class="header">
   <h1>KURDISH · KARWAN · iFILM ✨</h1>
-  <p>Dra för att ändra ordning • Karwan-kanaler öppnas i nytt webbläsarfönster 🪟</p>
+  <p>Dra för att ändra ordning • Karwan-kanaler visas direkt i spelaren 📺</p>
 </div>
 
 <div class="nav-buttons">
@@ -207,7 +195,18 @@
     <div class="video-wrapper" id="vwrap">
       <div class="error-msg">
         <h3>👈 Välj en kanal</h3>
-        <p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning<br>🪟 Karwan-kanaler öppnas i nytt webbläsarfönster</p>
+        <p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning<br>📺 Karwan-kanaler visas direkt i spelaren</p>
+      </div>
+      <!-- IFRAME OVERLAY — visas ovanpå spelaren för popup-kanaler -->
+      <div class="iframe-overlay" id="iframe-overlay">
+        <div class="iframe-bar">
+          <span class="iframe-bar-title" id="iframe-bar-title">📺</span>
+          <div class="iframe-bar-btns">
+            <button class="iframe-open-btn" onclick="iframeOpenExternal()" title="Öppna i nytt fönster">🪟 Nytt fönster</button>
+            <button class="iframe-close-btn" onclick="closeIframe()">✕ Stäng</button>
+          </div>
+        </div>
+        <iframe id="iframe-player" src="about:blank" allowfullscreen allow="autoplay; fullscreen; encrypted-media"></iframe>
       </div>
     </div>
   </main>
@@ -405,7 +404,7 @@ function reorderCategory(cat,arr){channels[cat]=arr;saveOrder(cat,arr);}
 // ===== State =====
 let hlsInst=null,dashInst=null,cur=null,favs=[],jsEnabled=true,tvMode=false;
 let stallTimer=null,lastTime=-1,dragSource=null,curFilter=null,curSub='all';
-let pendingPopupUrl='',pendingPopupName='';
+let currentIframeUrl='';
 try{favs=JSON.parse(localStorage.getItem('xomfavs')||'[]');}catch(e){favs=[];}
 
 function isTV(){const ua=navigator.userAgent||'';return /SmartTV|webOS|SMART-TV|HbbTV|NetCast|BRAVIA|Tizen/i.test(ua)||(window.innerWidth>=1920&&!('ontouchstart' in window)&&navigator.maxTouchPoints===0);}
@@ -414,6 +413,29 @@ function startStall(v){clearStall();lastTime=-1;stallTimer=setInterval(()=>{if(!
 function clearStall(){if(stallTimer){clearInterval(stallTimer);stallTimer=null;}}
 function destroyP(){clearStall();if(hlsInst){hlsInst.destroy();hlsInst=null;}if(dashInst){dashInst.reset();dashInst=null;}}
 
+// ===== Iframe overlay =====
+function openIframe(url, name) {
+  currentIframeUrl = url;
+  const overlay = document.getElementById('iframe-overlay');
+  const iframe = document.getElementById('iframe-player');
+  const title = document.getElementById('iframe-bar-title');
+  title.textContent = '📺 ' + name;
+  iframe.src = url;
+  overlay.classList.add('show');
+}
+
+function closeIframe() {
+  const overlay = document.getElementById('iframe-overlay');
+  const iframe = document.getElementById('iframe-player');
+  overlay.classList.remove('show');
+  iframe.src = 'about:blank';
+  currentIframeUrl = '';
+}
+
+function iframeOpenExternal() {
+  if (currentIframeUrl) window.open(currentIframeUrl, '_blank');
+}
+
 // ===== Render =====
 const catL={akhbar:'📰 Akhbar',musik:'🎵 Musik',minal:'🧒 Minal',film:'🎬 Film & Serie',dini:'🕌 Dini',sport:'⚽ Sport',karwan:'⭐ Karwan TV',ifilm:'🌍 iFilm'};
 const karwanSub={all:'Alla',blue:'Kids',purple:'Movie',pink:'Dubbad',grey:'Blandad',yellow:'Music',maroon:'Dokumentär',green:'Dini',brown:'Kultur',magenta:'Srodi Dini',beige:'Nyhet'};
@@ -421,7 +443,7 @@ function esc(s){return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 
 function row(ch,idx,cat){
   const m=ch.method||'hls';
-  const badge=m==='popup'?' <span class="tag">🪟</span>':m==='dash'?' <span class="tag">DASH</span>':'';
+  const badge=m==='popup'?' <span class="tag">📺</span>':m==='dash'?' <span class="tag">DASH</span>':'';
   const star=favs.some(f=>f.url===ch.url)?'⭐':'☆';
   const ac=(cur&&cur.url===ch.url)?'active':'';
   return `<div class="channel-item ${ch.color} ${ac}" draggable="true" data-url="${esc(ch.url)}" data-name="${esc(ch.name)}" data-method="${m}" data-referer="${ch.referer||''}" data-cat="${cat}" data-idx="${idx}">
@@ -455,55 +477,6 @@ function dDrop(e){
 }
 function dClean(){if(dragSource)dragSource.style.opacity='';document.querySelectorAll('.channel-item').forEach(el=>el.classList.remove('drag-over'));dragSource=null;}
 
-// ===== POPUP WINDOW (window.open) =====
-let popupWin = null;
-
-function openPopupWindow(url, name) {
-  pendingPopupUrl = url;
-  pendingPopupName = name;
-
-  // Visa bekräftelsedialogens kanalnamn och url
-  document.getElementById('pn-title').textContent = '📺 ' + name;
-  document.getElementById('pn-url').textContent = url;
-  document.getElementById('popup-notice').classList.add('show');
-}
-
-function doOpenPopupWindow() {
-  closeNotice();
-  const url = pendingPopupUrl;
-  const name = pendingPopupName;
-
-  // Beräkna fönsterstorlek: 85% av skärmen, centrerat
-  const w = Math.min(1280, Math.round(screen.width * 0.85));
-  const h = Math.min(800,  Math.round(screen.height * 0.85));
-  const left = Math.round((screen.width  - w) / 2);
-  const top  = Math.round((screen.height - h) / 2);
-
-  const features = `width=${w},height=${h},left=${left},top=${top},toolbar=yes,menubar=yes,scrollbars=yes,resizable=yes,location=yes,status=yes`;
-
-  // Stäng gammalt popup-fönster om det fortfarande är öppet
-  if (popupWin && !popupWin.closed) {
-    popupWin.location.href = url;
-    popupWin.focus();
-  } else {
-    popupWin = window.open(url, 'karwan_popup', features);
-    if (!popupWin) {
-      // Popup blockerades av webbläsaren — öppna i ny flik istället
-      window.open(url, '_blank');
-    } else {
-      popupWin.focus();
-    }
-  }
-}
-
-function closeNotice() {
-  document.getElementById('popup-notice').classList.remove('show');
-}
-
-function handleNoticeOverlay(e) {
-  if (e.target === document.getElementById('popup-notice')) closeNotice();
-}
-
 // ===== Play =====
 function play(url,name,method,referer){
   if(window.innerWidth<=768)document.getElementById('channel-list').classList.remove('show');
@@ -511,14 +484,17 @@ function play(url,name,method,referer){
   document.getElementById('ch-title').textContent=name;
   setTimeout(()=>{if(typeof updateFsL==='function')updateFsL();},50);
 
+  // Popup-kanaler visas nu i iframe-overlay direkt i spelaren
   if(method==='popup'){
     destroyP();
-    openPopupWindow(url, name);
+    closeIframe(); // återställ om en annan iframe redan är öppen
+    document.getElementById('vwrap').querySelector('.error-msg') && (document.getElementById('vwrap').querySelector('.error-msg').style.display='none');
+    openIframe(url, name);
     render(curFilter,curSub);
     return;
   }
 
-  closeNotice();
+  closeIframe();
   destroyP();
   const wrap=document.getElementById('vwrap');
 
@@ -530,6 +506,12 @@ function play(url,name,method,referer){
   wrap.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;gap:10px;"><div class="spinner"></div><span>Laddar ${name}…</span></div>`;
   setTimeout(()=>{
     wrap.innerHTML='<video id="vp" controls autoplay style="width:100%;height:100%;"></video>';
+    // Lägg tillbaka iframe-overlay i wrappern om den togs bort
+    if(!document.getElementById('iframe-overlay')){
+      const ov=document.createElement('div');ov.className='iframe-overlay';ov.id='iframe-overlay';
+      ov.innerHTML=`<div class="iframe-bar"><span class="iframe-bar-title" id="iframe-bar-title">📺</span><div class="iframe-bar-btns"><button class="iframe-open-btn" onclick="iframeOpenExternal()">🪟 Nytt fönster</button><button class="iframe-close-btn" onclick="closeIframe()">✕ Stäng</button></div></div><iframe id="iframe-player" src="about:blank" allowfullscreen allow="autoplay; fullscreen; encrypted-media"></iframe>`;
+      wrap.appendChild(ov);
+    }
     const v=document.getElementById('vp');
     if(Hls.isSupported()){
       hlsInst=new Hls(getHlsCfg(referer));
@@ -580,7 +562,7 @@ function showFsNav(){if(!document.fullscreenElement)return;document.getElementBy
 document.addEventListener('mousemove',showFsNav);document.addEventListener('touchstart',showFsNav);
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement){document.getElementById('fs-prev').classList.add('hidden');document.getElementById('fs-next').classList.add('hidden');clearTimeout(fsHT);}else{updateFsL();showFsNav();}});
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.getElementById('popup-notice').classList.contains('show')){closeNotice();return;}
+  if(e.key==='Escape'&&document.getElementById('iframe-overlay').classList.contains('show')){closeIframe();return;}
   if(!document.fullscreenElement)return;
   if(e.key==='ArrowLeft'){fsNavChannel(-1);showFsNav();}
   if(e.key==='ArrowRight'){fsNavChannel(1);showFsNav();}
