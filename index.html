@@ -70,7 +70,7 @@
     }
     .tv-mode .video-container { border-radius: 0; }
 
-    /* POPUP BROWSER - alla länkar stannar i samma fönster */
+    /* POPUP BROWSER - enklare, inget blockmeddelande */
     .popup-overlay {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.85);
@@ -116,19 +116,12 @@
     .popup-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #030c13; gap: 16px; z-index: 2; }
     .popup-loading-text { color: #4ecca3; font-size: 0.9rem; font-weight: 600; }
     .popup-loading-sub { color: #4a8a7a; font-size: 0.75rem; }
-    .popup-blocked { display: none; position: absolute; inset: 0; flex-direction: column; align-items: center; justify-content: center; background: #030c13; gap: 14px; z-index: 3; padding: 30px; text-align: center; }
-    .popup-blocked.show { display: flex; }
-    .popup-blocked-icon { font-size: 3.5rem; }
-    .popup-blocked-title { font-size: 1.1rem; font-weight: 700; color: #ff9977; }
-    .popup-blocked-sub { font-size: 0.82rem; color: #7a9a90; max-width: 340px; line-height: 1.6; }
-    .popup-blocked-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
     .popup-statusbar { background: #050e16; padding: 5px 16px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #4ecca318; flex-shrink: 0; }
     .popup-status-text { font-size: 0.68rem; color: #4ecca360; }
     .popup-fs-btn { background: none; border: none; color: #4ecca3; cursor: pointer; font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; transition: background 0.15s; }
     .popup-fs-btn:hover { background: #4ecca322; }
     .popup-resize { position: absolute; bottom: 22px; right: 4px; width: 18px; height: 18px; cursor: se-resize; color: #4ecca340; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
 
-    /* Fullskärmsnavigation */
     .fs-nav { position: fixed; top: 50%; transform: translateY(-50%); z-index: 9999; display: none; flex-direction: column; align-items: center; gap: 6px; opacity: 1; transition: opacity 0.4s ease; pointer-events: auto; }
     .fs-nav.hidden { opacity: 0; pointer-events: none; }
     .fs-nav-prev { left: 18px; }
@@ -150,7 +143,7 @@
   <div class="fs-nav-label" id="fs-next-label">Nästa</div>
 </div>
 
-<!-- POPUP BROWSER (alla länkar öppnas i samma iframe) -->
+<!-- POPUP BROWSER – vid blockering öppnas automatiskt i ny flik -->
 <div class="popup-overlay" id="popup-overlay" onclick="handleOverlayClick(event)">
   <div class="popup-browser" id="popup-browser">
     <div class="popup-titlebar" id="popup-drag-handle">
@@ -174,19 +167,8 @@
       <div class="popup-loading" id="popup-loading">
         <div class="spinner"></div>
         <div class="popup-loading-text">Laddar kanal…</div>
-        <div class="popup-loading-sub">Alla länkar öppnas automatiskt i samma fönster</div>
+        <div class="popup-loading-sub">Om sidan inte kan visas öppnas den automatiskt i en ny flik</div>
       </div>
-      <div class="popup-blocked" id="popup-blocked">
-        <div class="popup-blocked-icon">🔒</div>
-        <div class="popup-blocked-title">Webbplatsen blockerar inbäddning</div>
-        <div class="popup-blocked-sub">Webbplatsen tillåter inte visning i inbäddad ruta. Öppna i ny flik istället.</div>
-        <div class="popup-blocked-btns">
-          <button class="btn" onclick="openInNewTab()">🔗 Öppna i ny flik</button>
-          <button class="btn" onclick="popupReload()">↻ Försök igen</button>
-          <button class="btn" onclick="closePopup()">✕ Stäng</button>
-        </div>
-      </div>
-      <!-- FIX: utan allow-popups och allow-top-navigation så förblir alla länkar i samma iframe -->
       <iframe id="popup-iframe" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture" sandbox="allow-same-origin allow-scripts allow-forms allow-presentation" style="display:none;"></iframe>
     </div>
     <div class="popup-statusbar">
@@ -199,7 +181,7 @@
 
 <div class="header">
   <h1>KURDISH · KARWAN · iFILM ✨</h1>
-  <p>Dra för att ändra ordning • Karwan-kanaler öppnas i inbyggd popup (alla länkar stannar i popupen)</p>
+  <p>Dra för att ändra ordning • Karwan-kanaler öppnas i popup – blockeras de öppnas automatiskt i ny flik</p>
 </div>
 
 <div class="nav-buttons">
@@ -256,13 +238,13 @@
       </div>
     </div>
     <div class="video-wrapper" id="vwrap">
-      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning<br>🪟 Karwan-kanaler öppnas i inbyggd popup</p></div>
+      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning<br>🪟 Karwan-kanaler öppnas i popup – blockeras de öppnas automatiskt i ny flik</p></div>
     </div>
   </main>
 </div>
 
 <script>
-// ========== KOMPLETTA KANALDATA (alla kanaler från original, inget tomt) ==========
+// ========== KOMPLETTA KANALDATA (alla kanaler från original) ==========
 const akhbarRaw = [
   { name:'Zagros', url:'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', color:'green', subgroup:'news' },
   { name:'MMN News', url:'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8', color:'green', subgroup:'news' },
@@ -440,13 +422,56 @@ function filterDirect(b,cat){setActiveBtn(b); closeAllDD(); render(cat,'all');}
 function filterSub(cat,sub){setActiveBtn(document.getElementById('btn-'+cat)); closeAllDD(); render(cat,sub);}
 function toggleDD(ev,id){ev.stopPropagation(); const d=document.getElementById(id); const o=d.classList.contains('show'); closeAllDD(); if(!o){d.classList.add('show'); openDD=id; setTimeout(()=>document.addEventListener('click',outsideDD),10);}}
 
-// ========== POPUP BROWSER ==========
+// ========== POPUP BROWSER – vid blockering öppnas automatiskt i ny flik ==========
 let popUrl='', popName='', popHist=[], popHistIdx=-1, isMax=false, popOrigRect={};
 const allPopupChs=()=>Object.values(channels).flat().filter(c=>c.method==='popup');
 function buildQuickbar(activeUrl){const bar=document.getElementById('popup-quickbar'); bar.innerHTML=''; allPopupChs().forEach(ch=>{const b=document.createElement('button'); b.className='popup-quick-btn'+(ch.url===activeUrl?' pq-active':''); b.textContent=ch.name; b.onclick=()=>popLoad(ch.url,ch.name); bar.appendChild(b);}); const active=bar.querySelector('.pq-active'); if(active)setTimeout(()=>active.scrollIntoView({inline:'center',block:'nearest'}),50);}
-function openPopup(url,name){popUrl=url; popName=name; popHist=[url]; popHistIdx=0; const ov=document.getElementById('popup-overlay'); ov.classList.add('show'); document.getElementById('popup-title').textContent='📺 '+name; document.getElementById('popup-url-bar').textContent=url; document.getElementById('popup-status').textContent='Laddar…'; document.getElementById('popup-loading').style.display='flex'; document.getElementById('popup-loading-text').textContent='Laddar '+name+'…'; document.getElementById('popup-blocked').classList.remove('show'); const iframe=document.getElementById('popup-iframe'); iframe.style.display='none'; iframe.src=''; buildQuickbar(url); updatePopNavBtns(); setTimeout(()=>doLoadIframe(url),150);}
+function openPopup(url,name){popUrl=url; popName=name; popHist=[url]; popHistIdx=0; const ov=document.getElementById('popup-overlay'); ov.classList.add('show'); document.getElementById('popup-title').textContent='📺 '+name; document.getElementById('popup-url-bar').textContent=url; document.getElementById('popup-status').textContent='Laddar…'; document.getElementById('popup-loading').style.display='flex'; document.getElementById('popup-loading-text').textContent='Laddar '+name+'…'; const iframe=document.getElementById('popup-iframe'); iframe.style.display='none'; iframe.src=''; buildQuickbar(url); updatePopNavBtns(); setTimeout(()=>doLoadIframe(url),150);}
 let iframeTimeout=null;
-function doLoadIframe(url){const iframe=document.getElementById('popup-iframe'); const loading=document.getElementById('popup-loading'); const blocked=document.getElementById('popup-blocked'); loading.style.display='flex'; iframe.style.display='none'; blocked.classList.remove('show'); clearTimeout(iframeTimeout); iframeTimeout=setTimeout(()=>{loading.style.display='none'; iframe.style.display='none'; blocked.classList.add('show'); document.getElementById('popup-status').textContent='⚠️ Webbplatsen blockerar inbäddning';},7000); iframe.onload=()=>{clearTimeout(iframeTimeout); let isBlocked=false; try{const doc=iframe.contentDocument||iframe.contentWindow?.document; if(doc&&(doc.body===null||doc.body?.innerHTML?.trim()==='')){isBlocked=true;}}catch(e){} if(isBlocked){loading.style.display='none'; iframe.style.display='none'; blocked.classList.add('show'); document.getElementById('popup-status').textContent='⚠️ Blockerad';}else{loading.style.display='none'; iframe.style.display='block'; document.getElementById('popup-status').textContent='✓ '+popName;}}; iframe.onerror=()=>{clearTimeout(iframeTimeout); loading.style.display='none'; blocked.classList.add('show'); document.getElementById('popup-status').textContent='Fel vid laddning';}; iframe.src=url;}
+function doLoadIframe(url){
+  const iframe=document.getElementById('popup-iframe');
+  const loading=document.getElementById('popup-loading');
+  const statusSpan=document.getElementById('popup-status');
+  clearTimeout(iframeTimeout);
+  loading.style.display='flex';
+  iframe.style.display='none';
+  iframe.src='';
+  let blocked=false;
+  iframeTimeout=setTimeout(()=>{
+    blocked=true;
+    loading.style.display='none';
+    statusSpan.textContent='⚠️ Blockerad – öppnar i ny flik';
+    closePopup();
+    window.open(url,'_blank');
+  }, 8000);
+  iframe.onload=()=>{
+    clearTimeout(iframeTimeout);
+    if(blocked) return;
+    let isEmpty=false;
+    try{
+      const doc=iframe.contentDocument||iframe.contentWindow?.document;
+      if(doc && (!doc.body || doc.body.innerHTML.trim()==='')) isEmpty=true;
+    }catch(e){ isEmpty=false; } // cross-origin men sidan laddad = ok
+    if(isEmpty){
+      loading.style.display='none';
+      statusSpan.textContent='⚠️ Tom sida – öppnar i ny flik';
+      closePopup();
+      window.open(url,'_blank');
+    } else {
+      loading.style.display='none';
+      iframe.style.display='block';
+      statusSpan.textContent='✓ '+popName;
+    }
+  };
+  iframe.onerror=()=>{
+    clearTimeout(iframeTimeout);
+    loading.style.display='none';
+    statusSpan.textContent='Fel – öppnar i ny flik';
+    closePopup();
+    window.open(url,'_blank');
+  };
+  iframe.src=url;
+}
 function popLoad(url,name){popUrl=url; popName=name; if(popHistIdx<popHist.length-1)popHist=popHist.slice(0,popHistIdx+1); popHist.push(url); popHistIdx=popHist.length-1; document.getElementById('popup-title').textContent='📺 '+name; document.getElementById('popup-url-bar').textContent=url; buildQuickbar(url); updatePopNavBtns(); doLoadIframe(url);}
 function popupBack(){if(popHistIdx>0){popHistIdx--; popUrl=popHist[popHistIdx]; document.getElementById('popup-url-bar').textContent=popUrl; doLoadIframe(popUrl); updatePopNavBtns();}}
 function popupForward(){if(popHistIdx<popHist.length-1){popHistIdx++; popUrl=popHist[popHistIdx]; document.getElementById('popup-url-bar').textContent=popUrl; doLoadIframe(popUrl); updatePopNavBtns();}}
