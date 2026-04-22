@@ -6,10 +6,6 @@
   <title>KURDISH · KARWAN · iFILM | Dra & sortera · JS AV fungerar</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-  <!-- Moment.js + Hijri & Jalaali plugins för datumkonvertering -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-hijri/2.1.0/moment-hijri.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-jalaali/0.9.6/moment-jalaali.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #fff; min-height: 100vh; }
@@ -17,7 +13,6 @@
     .header h1 { font-size: 2.3em; color: #4ecca3; letter-spacing: -0.5px; margin-bottom: 6px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
     .header p { opacity: 0.8; font-size: 0.85rem; }
 
-    /* === NYTT PANEL: KLOCKA, DATUM, VÄDER === */
     .info-panel {
       background: rgba(0, 0, 0, 0.55);
       backdrop-filter: blur(12px);
@@ -131,7 +126,6 @@
       .clock-display { font-size: 1.5rem; min-width: auto; }
     }
 
-    /* NAV */
     .nav-buttons {
       display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
       padding: 12px 16px; background: rgba(0,0,0,0.25); position: relative;
@@ -146,7 +140,6 @@
       background: #4ecca3; color: #0a1c2a; transform: scale(1.02);
       box-shadow: 0 4px 10px rgba(78,204,163,0.3);
     }
-    /* Dropdown */
     .dd-wrap { position: relative; display: inline-block; }
     .dropdown-menu {
       position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
@@ -161,7 +154,6 @@
     }
     .dropdown-item:hover { background: #4ecca3; color: #0a1c2a; transform: translateX(5px); }
 
-    /* LAYOUT (resten oförändrad) */
     .container { display: flex; height: calc(100vh - 280px); padding: 0 16px 16px; gap: 16px; }
     .channel-list { width: 280px; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); overflow-y: auto; border-radius: 22px; padding: 12px; scrollbar-width: thin; }
     .video-container { flex: 1; background: #03090e; border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #2c5f6e; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
@@ -212,7 +204,6 @@
     .tv-mode .video-container { border-radius: 0; }
     .tv-mode .channel-list { background: #000000cc; }
 
-    /* Fullskärms-navigering */
     .fs-nav { position: fixed; top: 50%; transform: translateY(-50%); z-index: 9999; display: none; flex-direction: column; align-items: center; gap: 6px; opacity: 1; transition: opacity 0.4s ease; pointer-events: auto; }
     .fs-nav.hidden { opacity: 0; pointer-events: none; }
     .fs-nav-prev { left: 18px; }
@@ -224,7 +215,6 @@
   </style>
 </head>
 <body>
-<!-- Fullskärms-navigering -->
 <div class="fs-nav fs-nav-prev hidden" id="fs-prev"><button class="fs-nav-btn" onclick="fsNavChannel(-1)" title="Föregående kanal">&#8592;</button><div class="fs-nav-label" id="fs-prev-label">Föregående</div></div>
 <div class="fs-nav fs-nav-next hidden" id="fs-next"><button class="fs-nav-btn" onclick="fsNavChannel(1)" title="Nästa kanal">&#8594;</button><div class="fs-nav-label" id="fs-next-label">Nästa</div></div>
 
@@ -233,16 +223,13 @@
   <p>Dra för att ändra ordning • Klicka för att spela</p>
 </div>
 
-<!-- === NYTT: KLOCKA, DATUM & VÄDER PANEL === -->
 <div class="info-panel">
-  <!-- KLOCKA med sekundvisare + digital/analog val -->
   <div class="clock-section">
     <div id="digitalClockDisplay" class="clock-display">--:--:--</div>
     <canvas id="analogCanvas" class="analog-canvas" width="120" height="120" style="width:70px; height:70px; display: none;"></canvas>
     <button id="toggleClockBtn" class="toggle-clock">🔁 Analog</button>
   </div>
 
-  <!-- DATUM med val: gregoriansk, islamisk, iransk -->
   <div class="date-section">
     <div class="date-selector">
       <select id="calendarSelect">
@@ -254,7 +241,6 @@
     <div id="dateDisplay" class="date-text">Laddar datum...</div>
   </div>
 
-  <!-- VÄDER baserat på land & stad -->
   <div class="weather-section">
     <div class="weather-input">
       <input type="text" id="cityInput" placeholder="Stad" value="Erbil">
@@ -461,7 +447,6 @@ const ifilmRaw = [
   { name: 'iFilm Arabic', url: 'https://live.presstv.ir/hls/ifilmar.m3u8', color:'cyan' }
 ];
 
-// Lagring & sortering
 function loadOrder(cat) { try { const o = localStorage.getItem('order_'+cat); return o ? JSON.parse(o) : null; } catch(e) { return null; } }
 function saveOrder(cat, arr) { localStorage.setItem('order_'+cat, JSON.stringify(arr.map(c=>c.url))); }
 function applyStoredOrder(arr, key) {
@@ -517,7 +502,6 @@ function fav(url, name) {
 }
 function toggleList() { document.getElementById('channel-list').classList.toggle('show'); }
 
-// Rendering
 function render(filter, sub) {
   curFilter = filter; curSub = sub || 'all';
   let html = '';
@@ -612,7 +596,6 @@ function play(url, name, method, referer) {
   render(curFilter, curSub);
 }
 
-// Fullskärms-navigering
 function getAllChannels() {
   if (curFilter && channels[curFilter]) {
     if (curFilter === 'karwan' && curSub !== 'all') return channels.karwan.filter(c => c.subgroup === curSub);
@@ -660,7 +643,7 @@ function filterSub(cat, sub) { setActiveBtn(document.getElementById('btn-'+cat))
 function setActiveBtn(btn) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); }
 function toggleDD(ev, ddId) { ev.stopPropagation(); const dd = document.getElementById(ddId); const isOpen = dd.classList.contains('show'); document.querySelectorAll('.dropdown-menu').forEach(d=>d.classList.remove('show')); if (!isOpen) dd.classList.add('show'); }
 
-// ========== KLOCKA, DATUM, VÄDER ==========
+// ========== KLOCKA ==========
 let clockMode = 'digital';
 let clockInterval;
 function initClock() {
@@ -692,7 +675,7 @@ function initClock() {
       clockMode = 'analog';
       toggleBtn.innerText = '🔁 Digital';
       if (clockInterval) clearInterval(clockInterval);
-      clockInterval = setInterval(() => { drawAnalog(); updateFsLabels?.(); }, 1000);
+      clockInterval = setInterval(drawAnalog, 1000);
       drawAnalog();
     } else {
       digitalDiv.style.display = 'block';
@@ -700,7 +683,7 @@ function initClock() {
       clockMode = 'digital';
       toggleBtn.innerText = '🔁 Analog';
       if (clockInterval) clearInterval(clockInterval);
-      clockInterval = setInterval(() => { updateDigital(); updateFsLabels?.(); }, 1000);
+      clockInterval = setInterval(updateDigital, 1000);
       updateDigital();
     }
   }
@@ -709,14 +692,65 @@ function initClock() {
   clockInterval = setInterval(() => { if (clockMode === 'digital') updateDigital(); else drawAnalog(); }, 1000);
   updateDigital(); drawAnalog();
 }
+
+// ========== DATUM — FIX: Intl.DateTimeFormat istället för moment.js plugins ==========
 function updateDateByCalendar() {
   const cal = document.getElementById('calendarSelect').value;
+  const now = new Date();
   let formatted = '';
-  if (cal === 'gregorian') formatted = moment().format('dddd, DD MMMM YYYY');
-  else if (cal === 'islamic') formatted = moment().format('iDD iMMMM iYYYY');
-  else if (cal === 'iranian') formatted = moment().format('jDD jMMMM jYYYY');
+
+  try {
+    if (cal === 'gregorian') {
+      // Gregoriansk med svenska dagnamn och månadsnamn
+      formatted = now.toLocaleDateString('sv-SE', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+
+    } else if (cal === 'islamic') {
+      // Islamisk Hijri-kalender via Intl API
+      const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        weekday: 'long'
+      }).format(now);
+      // Visa även på engelska för tydlighet
+      const hijriEn = new Intl.DateTimeFormat('en-u-ca-islamic', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(now);
+      formatted = `🕌 ${hijriDate} (${hijriEn})`;
+
+    } else if (cal === 'iranian') {
+      // Iransk/Persisk Jalali-kalender via Intl API
+      const persianDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        weekday: 'long'
+      }).format(now);
+      // Visa även på engelska för siffror
+      const persianEn = new Intl.DateTimeFormat('en-u-ca-persian', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }).format(now);
+      formatted = `🇮🇷 ${persianDate} (${persianEn})`;
+    }
+  } catch (e) {
+    // Fallback om webbläsaren inte stöder kalendertypen
+    formatted = now.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    console.warn('Kalender ej stödd av webbläsaren:', e);
+  }
+
   document.getElementById('dateDisplay').innerHTML = formatted;
 }
+
+// ========== VÄDER ==========
 async function fetchWeather() {
   const city = document.getElementById('cityInput').value.trim();
   const country = document.getElementById('countryInput').value.trim();
@@ -741,7 +775,7 @@ async function fetchWeather() {
       if (weatherCode >= 51 && weatherCode <= 67) icon = '🌧️';
       else if (weatherCode >= 71 && weatherCode <= 77) icon = '❄️';
       else if (weatherCode >= 80 && weatherCode <= 99) icon = '⛈️';
-      else if (weatherCode >= 3 && weatherCode <= 3) icon = '☁️';
+      else if (weatherCode === 3) icon = '☁️';
       document.getElementById('weatherInfo').innerHTML = `${icon} ${temp}°C   💨 ${wind} m/s  | ${loc.name}, ${loc.country}`;
     } else throw new Error('Väderdata saknas');
   } catch(err) { document.getElementById('weatherInfo').innerHTML = `❌ ${err.message}`; console.error(err); }
