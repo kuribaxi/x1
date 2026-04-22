@@ -243,8 +243,8 @@
 
   <div class="weather-section">
     <div class="weather-input">
-      <input type="text" id="cityInput" placeholder="Stad" value="Erbil">
-      <input type="text" id="countryInput" placeholder="Land" value="Iraq">
+      <input type="text" id="cityInput" placeholder="Stad" value="Stockholm">
+      <input type="text" id="countryInput" placeholder="Land" value="Sweden">
       <button id="fetchWeatherBtn" class="weather-btn">🌤 Uppdatera</button>
     </div>
     <div id="weatherInfo" class="weather-info">🌍 Sök väder</div>
@@ -693,7 +693,7 @@ function initClock() {
   updateDigital(); drawAnalog();
 }
 
-// ========== DATUM — FIX: Intl.DateTimeFormat istället för moment.js plugins ==========
+// ========== DATUM ==========
 function updateDateByCalendar() {
   const cal = document.getElementById('calendarSelect').value;
   const now = new Date();
@@ -701,7 +701,6 @@ function updateDateByCalendar() {
 
   try {
     if (cal === 'gregorian') {
-      // Gregoriansk med svenska dagnamn och månadsnamn
       formatted = now.toLocaleDateString('sv-SE', {
         weekday: 'long',
         day: 'numeric',
@@ -710,14 +709,12 @@ function updateDateByCalendar() {
       });
 
     } else if (cal === 'islamic') {
-      // Islamisk Hijri-kalender via Intl API
       const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
         weekday: 'long'
       }).format(now);
-      // Visa även på engelska för tydlighet
       const hijriEn = new Intl.DateTimeFormat('en-u-ca-islamic', {
         day: 'numeric',
         month: 'long',
@@ -726,14 +723,12 @@ function updateDateByCalendar() {
       formatted = `🕌 ${hijriDate} (${hijriEn})`;
 
     } else if (cal === 'iranian') {
-      // Iransk/Persisk Jalali-kalender via Intl API
       const persianDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
         weekday: 'long'
       }).format(now);
-      // Visa även på engelska för siffror
       const persianEn = new Intl.DateTimeFormat('en-u-ca-persian', {
         day: 'numeric',
         month: 'long',
@@ -742,7 +737,6 @@ function updateDateByCalendar() {
       formatted = `🇮🇷 ${persianDate} (${persianEn})`;
     }
   } catch (e) {
-    // Fallback om webbläsaren inte stöder kalendertypen
     formatted = now.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     console.warn('Kalender ej stödd av webbläsaren:', e);
   }
