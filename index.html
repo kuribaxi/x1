@@ -619,51 +619,6 @@ function attachChannelEvents() {
   });
 }
 
-// ========== POPUP-HJÄLPFUNKTIONER ==========
-let popupWin = null;
-function openPopup(url, name) {
-  const w = 1100, h = 680;
-  const left = Math.max(0, (screen.width - w) / 2);
-  const top  = Math.max(0, (screen.height - h) / 2);
-  if (popupWin && !popupWin.closed) popupWin.close();
-  popupWin = window.open(url, 'karwan_player', `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`);
-}
-function buildPopupMsg(url, name) {
-  return `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-      height:100%;gap:18px;background:radial-gradient(ellipse at center,#0f2a35,#060f14);padding:30px;text-align:center;">
-      <div style="font-size:3.5rem;">📺</div>
-      <div style="font-size:1.3rem;font-weight:bold;color:#4ecca3;">${escapeHtml(name)}</div>
-      <div style="background:#1e3a45;border-radius:16px;padding:16px 24px;max-width:380px;font-size:0.9rem;line-height:1.6;color:#cde;">
-        Denna kanal kräver eget fönster.<br>
-        <span style="color:#4ecca3;font-weight:bold;">Popup-fönstret öppnades automatiskt.</span><br>
-        Om det stängts, klicka nedan:
-      </div>
-      <button onclick="openPopup('${escapeHtml(url)}','${escapeHtml(name)}')"
-        style="background:#4ecca3;color:#0a1c2a;border:none;padding:12px 28px;border-radius:40px;
-        font-size:1rem;font-weight:bold;cursor:pointer;box-shadow:0 4px 14px rgba(78,204,163,0.4);">
-        🔗 Öppna kanalen igen
-      </button>
-      <div style="opacity:0.45;font-size:0.75rem;">Tillåt popup i webbläsaren om fönstret inte öppnas</div>
-    </div>`;
-}
-function showIframeFallback(url, name) {
-  const fb = document.getElementById('iframe-fallback');
-  const fr = document.getElementById('ch-iframe');
-  if (fb) { fb.style.display = 'block'; fb.innerHTML = buildPopupMsg(url, name); }
-  if (fr) fr.style.display = 'none';
-}
-function checkIframeLoad(iframe) {
-  try {
-    const body = iframe.contentDocument && iframe.contentDocument.body;
-    if (!body || body.innerHTML === '') showIframeFallback(cur?.url, cur?.name);
-  } catch(e) {
-    // cross-origin = blockerad, visa fallback + öppna popup
-    showIframeFallback(cur?.url, cur?.name);
-    if (cur) openPopup(cur.url, cur.name);
-  }
-}
-
 // ========== PLAY FUNKTION MED AUDIO-STÖD ==========
 function play(url, name, method, referer) {
   if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
@@ -707,37 +662,11 @@ function play(url, name, method, referer) {
   // ----- IFRAME (webbsidor / inbyggda spelare) -----
   if (method === 'iframe') {
     if (!jsEnabled) {
-      openPopup(url, name);
-      wrap.innerHTML = buildPopupMsg(url, name);
-      render(curFilter, curSub);
-      return;
+      window.open(url, '_blank');
+      wrap.innerHTML = `<div class="error-msg"><h3>🔗 Öppnade i ny flik</h3></div>`;
+    } else {
+      wrap.innerHTML = `<iframe src="${escapeHtml(url)}" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>`;
     }
-    // Försök visa i iframe — om sidan blockerar X-Frame-Options visas popup-meddelande
-    wrap.innerHTML = `
-      <div id="iframe-wrap" style="width:100%;height:100%;position:relative;">
-        <iframe id="ch-iframe" src="${escapeHtml(url)}"
-          allowfullscreen allow="autoplay; fullscreen"
-          style="width:100%;height:100%;border:none;"
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"
-          onload="checkIframeLoad(this)">
-        </iframe>
-        <div id="iframe-fallback" style="display:none;width:100%;height:100%;position:absolute;top:0;left:0;">
-          ${buildPopupMsg(url, name)}
-        </div>
-      </div>`;
-    // Timeout-kontroll: om iframe är tom/blockerad efter 3s → visa popup-läge
-    setTimeout(() => {
-      const fr = document.getElementById('ch-iframe');
-      if (!fr) return;
-      try {
-        const body = fr.contentDocument && fr.contentDocument.body;
-        if (!body || body.innerHTML === '') showIframeFallback(url, name);
-      } catch(e) {
-        // cross-origin blockerad → öppna popup automatiskt
-        showIframeFallback(url, name);
-        openPopup(url, name);
-      }
-    }, 3000);
     render(curFilter, curSub);
     return;
   }
