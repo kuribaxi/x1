@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>KURDISH · KARWAN · iFILM | Dra & sortera · JS AV fungerar</title>
+  <title>KURDISH · KARWAN · Radio| Dra & sortera · JS AV fungerar</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
   <style>
@@ -219,7 +219,7 @@
 <div class="fs-nav fs-nav-next hidden" id="fs-next"><button class="fs-nav-btn" onclick="fsNavChannel(1)" title="Nästa kanal">&#8594;</button><div class="fs-nav-label" id="fs-next-label">Nästa</div></div>
 
 <div class="header">
-  <h1>KURDISH · KARWAN · iFILM ✨</h1>
+  <h1>KURDISH · KARWAN · Radio✨</h1>
   <p>Dra för att ändra ordning • Klicka för att spela</p>
 </div>
 
@@ -260,7 +260,7 @@
   <button class="nav-btn" id="btn-dini" onclick="filterDirect(this,'dini')">🕌 Dini</button>
   <button class="nav-btn" id="btn-sport" onclick="filterDirect(this,'sport')">⚽ Sport</button>
   <div class="dd-wrap"><button class="nav-btn" id="btn-karwan" onclick="toggleDD(event,'dd-karwan')">⭐ Karwan TV ▾</button><div class="dropdown-menu" id="dd-karwan"><div class="dropdown-item" onclick="filterSub('karwan','all')">📺 Alla Karwan</div><div class="dropdown-item" onclick="filterSub('karwan','blue')">🧸 Kids</div><div class="dropdown-item" onclick="filterSub('karwan','purple')">🎬 Movie</div><div class="dropdown-item" onclick="filterSub('karwan','pink')">🎭 Dubbad</div><div class="dropdown-item" onclick="filterSub('karwan','grey')">🌀 Blandad</div><div class="dropdown-item" onclick="filterSub('karwan','yellow')">🎵 Music</div><div class="dropdown-item" onclick="filterSub('karwan','maroon')">📽 Dokumentär</div><div class="dropdown-item" onclick="filterSub('karwan','green')">🕌 Dini</div><div class="dropdown-item" onclick="filterSub('karwan','brown')">🏛 Kultur</div><div class="dropdown-item" onclick="filterSub('karwan','magenta')">🎶 Srodi Dini</div><div class="dropdown-item" onclick="filterSub('karwan','beige')">📰 Nyhet</div></div></div>
-  <button class="nav-btn" id="btn-ifilm" onclick="filterDirect(this,'ifilm')">🌍 iFilm</button>
+  <button class="nav-btn" id="btn-radio" onclick="filterDirect(this,'Radio')">🌍 Radio</button>
 </div>
 
 <div class="container">
@@ -440,11 +440,12 @@ const karwanRaw = [
   { name: 'Kirkuk TV', url: 'https://karwan.tv/kirkuk-tv', method:'iframe', color:'beige', subgroup:'beige' },
   { name: 'Ava TV', url: 'https://karwan.tv/ava-tv', method:'iframe', color:'beige', subgroup:'beige' }
 ];
-const ifilmRaw = [
-  { name: 'iFilm Farsi', url: 'https://live.presstv.ir/hls/ifilmfa.m3u8', color:'cyan' },
-  { name: 'iFilm Dari', url: 'https://live.presstv.ir/hls/ifilm2.m3u8', color:'cyan' },
-  { name: 'iFilm English', url: 'https://live.presstv.ir/hls/ifilmen.m3u8', color:'cyan' },
-  { name: 'iFilm Arabic', url: 'https://live.presstv.ir/hls/ifilmar.m3u8', color:'cyan' }
+const RadioRaw = [
+  { name: 'Rudaw', url: 'https://radio.rudaw.net/stream/live', method:'iframe', color:'cyan' },
+  { name: 'Kurdsat', url: 'https://stream-146.zeno.fm/aky4f7r29f8uv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJha3k0ZjdyMjlmOHV2IiwiaG9zdCI6InN0cmVhbS0xNDYuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6IlluQVUtd09rUXdlMzVjeHlWQTQ1bnciLCJpYXQiOjE3NzcxMjE4MDIsImV4cCI6MTc3NzEyMTg2Mn0.beHDqGzFtEasRG2Hev5GYMk_aKEeiop4G0bJJ3n0iUI', method:'iframe', color:'cyan' },
+  { name: 'Sunnat', url: 'https://a1.asurahosting.com:9380/radio.mp3', method:'iframe', color:'cyan' },
+  { name: 'Mihrab', url: 'http://bblserver.ddns.net:1935/live/mihrabfm/playlist.m3u8', method:'iframe', color:'cyan' }
+  { name: 'Ava', url: 'https://ava.holan.it.com/;?type=http&nocache=1', method:'iframe', color:'cyan' }
 ];
 
 function loadOrder(cat) { try { const o = localStorage.getItem('order_'+cat); return o ? JSON.parse(o) : null; } catch(e) { return null; } }
@@ -466,7 +467,7 @@ const channels = {
   dini:   applyStoredOrder([...diniRaw], 'dini'),
   sport:  applyStoredOrder([...sportRaw], 'sport'),
   karwan: applyStoredOrder([...karwanRaw], 'karwan'),
-  ifilm:  applyStoredOrder([...ifilmRaw], 'ifilm')
+  Radio:  applyStoredOrder([...RadioRaw], 'Radio')
 };
 function reorderCategory(cat, newArr) { channels[cat] = newArr; saveOrder(cat, newArr); }
 
