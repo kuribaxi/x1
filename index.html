@@ -212,6 +212,39 @@
     .fs-nav-btn { background: rgba(0,0,0,0.55); backdrop-filter: blur(8px); border: 2px solid rgba(78,204,163,0.6); color: #4ecca3; width: 52px; height: 52px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s, border-color 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
     .fs-nav-btn:hover { background: #4ecca3; color: #0a1c2a; transform: scale(1.1); border-color: #4ecca3; }
     .fs-nav-label { font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 20px; max-width: 90px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; backdrop-filter: blur(4px); }
+
+    /* Radio Player Styles */
+    .radio-player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 22px;
+      background: radial-gradient(ellipse at center, #0f2a35 0%, #060f14 100%);
+      padding: 30px;
+    }
+    .radio-icon { font-size: 4rem; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.08); opacity:0.85; } }
+    .radio-name { font-size: 1.4rem; font-weight: bold; color: #4ecca3; text-shadow: 0 0 10px #4ecca355; }
+    .radio-audio { width: 85%; max-width: 420px; accent-color: #4ecca3; }
+    .radio-visualizer {
+      display: flex; align-items: flex-end; gap: 4px; height: 40px;
+    }
+    .radio-bar {
+      width: 5px; background: #4ecca3; border-radius: 3px;
+      animation: barAnim 0.8s ease-in-out infinite alternate;
+    }
+    .radio-bar:nth-child(1) { animation-delay: 0.0s; }
+    .radio-bar:nth-child(2) { animation-delay: 0.1s; }
+    .radio-bar:nth-child(3) { animation-delay: 0.2s; }
+    .radio-bar:nth-child(4) { animation-delay: 0.3s; }
+    .radio-bar:nth-child(5) { animation-delay: 0.4s; }
+    .radio-bar:nth-child(6) { animation-delay: 0.3s; }
+    .radio-bar:nth-child(7) { animation-delay: 0.2s; }
+    .radio-bar:nth-child(8) { animation-delay: 0.1s; }
+    @keyframes barAnim { from { height: 6px; opacity:0.4; } to { height: 36px; opacity:1; } }
+    .radio-status { font-size: 0.82rem; opacity: 0.65; letter-spacing: 1px; }
   </style>
 </head>
 <body>
@@ -260,7 +293,7 @@
   <button class="nav-btn" id="btn-dini" onclick="filterDirect(this,'dini')">🕌 Dini</button>
   <button class="nav-btn" id="btn-sport" onclick="filterDirect(this,'sport')">⚽ Sport</button>
   <div class="dd-wrap"><button class="nav-btn" id="btn-karwan" onclick="toggleDD(event,'dd-karwan')">⭐ Karwan TV ▾</button><div class="dropdown-menu" id="dd-karwan"><div class="dropdown-item" onclick="filterSub('karwan','all')">📺 Alla Karwan</div><div class="dropdown-item" onclick="filterSub('karwan','blue')">🧸 Kids</div><div class="dropdown-item" onclick="filterSub('karwan','purple')">🎬 Movie</div><div class="dropdown-item" onclick="filterSub('karwan','pink')">🎭 Dubbad</div><div class="dropdown-item" onclick="filterSub('karwan','grey')">🌀 Blandad</div><div class="dropdown-item" onclick="filterSub('karwan','yellow')">🎵 Music</div><div class="dropdown-item" onclick="filterSub('karwan','maroon')">📽 Dokumentär</div><div class="dropdown-item" onclick="filterSub('karwan','green')">🕌 Dini</div><div class="dropdown-item" onclick="filterSub('karwan','brown')">🏛 Kultur</div><div class="dropdown-item" onclick="filterSub('karwan','magenta')">🎶 Srodi Dini</div><div class="dropdown-item" onclick="filterSub('karwan','beige')">📰 Nyhet</div></div></div>
-  <button class="nav-btn" id="btn-radio" onclick="filterDirect(this,'Radio')">🌍 Radio</button>
+  <button class="nav-btn" id="btn-Radio" onclick="filterDirect(this,'Radio')">🌍 Radio</button>
 </div>
 
 <div class="container">
@@ -269,7 +302,7 @@
 </div>
 
 <script>
-// ========== KANALDATA (KOMPLETT) ==========
+// ========== KANALDATA ==========
 const akhbarRaw = [
   { name: 'Zagros', url: 'https://5a3ed7a72ed4b.streamlock.net/zagrostv/SMIL:myStream.smil/playlist.m3u8', color: 'green', subgroup:'news' },
   { name: 'MMN News', url: 'http://mmn.mypsx.net:1935/live/mmnhdnews/playlist.m3u8', color: 'green', subgroup:'news' },
@@ -440,14 +473,16 @@ const karwanRaw = [
   { name: 'Kirkuk TV', url: 'https://karwan.tv/kirkuk-tv', method:'iframe', color:'beige', subgroup:'beige' },
   { name: 'Ava TV', url: 'https://karwan.tv/ava-tv', method:'iframe', color:'beige', subgroup:'beige' }
 ];
+
+// ========== RADIO — method:'audio' för direkta streams, method:'hls' för M3U8 ==========
 const RadioRaw = [
-  { name: 'Rudaw', url: 'https://radio.rudaw.net/stream/live', method:'iframe', color:'cyan' },
-  { name: 'Kurdsat', url: 'https://stream-146.zeno.fm/aky4f7r29f8uv?zt=eyJhbGciOiJIUzI1NiJ9.eyJzdHJlYW0iOiJha3k0ZjdyMjlmOHV2IiwiaG9zdCI6InN0cmVhbS0xNDYuemVuby5mbSIsInJ0dGwiOjUsImp0aSI6IlluQVUtd09rUXdlMzVjeHlWQTQ1bnciLCJpYXQiOjE3NzcxMjE4MDIsImV4cCI6MTc3NzEyMTg2Mn0.beHDqGzFtEasRG2Hev5GYMk_aKEeiop4G0bJJ3n0iUI', method:'iframe', color:'cyan' },
-  { name: 'Sunnat', url: 'https://a1.asurahosting.com:9380/radio.mp3', method:'iframe', color:'cyan' },
-  { name: 'Mihrab', url: 'http://bblserver.ddns.net:1935/live/mihrabfm/chunklist_w841979247.m3u8', method:'iframe', color:'cyan' },
-  { name: 'Mihrab', url: 'http://bblserver.ddns.net:1935/live/mihrabfm/playlist.m3u8', method:'iframe', color:'cyan' },
-  { name: 'Mihrab', url: ' http://siliconvalley.servep2p.com:8000/mihrab', method:'iframe', color:'cyan' },
-  { name: 'Ava', url: 'https://ava.holan.it.com/;?type=http&nocache=1', method:'iframe', color:'cyan' }
+  { name: 'Rudaw Radio',    url: 'https://radio.rudaw.net/stream/live',                                      method:'audio', color:'cyan' },
+  { name: 'Kurdsat Radio',  url: 'https://stream-146.zeno.fm/aky4f7r29f8uv',                                 method:'audio', color:'cyan' },
+  { name: 'Sunnat Radio',   url: 'https://a1.asurahosting.com:9380/radio.mp3',                               method:'audio', color:'cyan' },
+  { name: 'Mihrab HLS',     url: 'http://bblserver.ddns.net:1935/live/mihrabfm/playlist.m3u8',               method:'hls',   color:'cyan' },
+  { name: 'Mihrab Chunk',   url: 'http://bblserver.ddns.net:1935/live/mihrabfm/chunklist_w841979247.m3u8',   method:'hls',   color:'cyan' },
+  { name: 'Mihrab MP3',     url: 'http://siliconvalley.servep2p.com:8000/mihrab',                            method:'audio', color:'cyan' },
+  { name: 'Ava Radio',      url: 'https://ava.holan.it.com/;?type=http&nocache=1',                           method:'audio', color:'cyan' }
 ];
 
 function loadOrder(cat) { try { const o = localStorage.getItem('order_'+cat); return o ? JSON.parse(o) : null; } catch(e) { return null; } }
@@ -463,13 +498,13 @@ function applyStoredOrder(arr, key) {
 }
 const channels = {
   akhbar: applyStoredOrder([...akhbarRaw], 'akhbar'),
-  musik:  applyStoredOrder([...musikRaw], 'musik'),
-  minal:  applyStoredOrder([...minalRaw], 'minal'),
-  film:   applyStoredOrder([...filmRaw], 'film'),
-  dini:   applyStoredOrder([...diniRaw], 'dini'),
-  sport:  applyStoredOrder([...sportRaw], 'sport'),
+  musik:  applyStoredOrder([...musikRaw],  'musik'),
+  minal:  applyStoredOrder([...minalRaw],  'minal'),
+  film:   applyStoredOrder([...filmRaw],   'film'),
+  dini:   applyStoredOrder([...diniRaw],   'dini'),
+  sport:  applyStoredOrder([...sportRaw],  'sport'),
   karwan: applyStoredOrder([...karwanRaw], 'karwan'),
-  Radio:  applyStoredOrder([...RadioRaw], 'Radio')
+  Radio:  applyStoredOrder([...RadioRaw],  'Radio')
 };
 function reorderCategory(cat, newArr) { channels[cat] = newArr; saveOrder(cat, newArr); }
 
@@ -524,7 +559,9 @@ function render(filter, sub) {
 }
 function row(ch, idx, catKey) {
   const m = ch.method || 'hls';
-  const badge = m === 'iframe' ? ' <span class="tag">📺 live</span>' : '';
+  let badge = '';
+  if (m === 'iframe') badge = ' <span class="tag">📺 live</span>';
+  else if (m === 'audio') badge = ' <span class="tag">🎙️ radio</span>';
   const star = favs.some(f => f.url === ch.url) ? '⭐' : '☆';
   const activeClass = (cur && cur.url === ch.url) ? 'active' : '';
   return `<div class="channel-item ${ch.color} ${activeClass}" draggable="true" data-url="${escapeHtml(ch.url)}" data-name="${escapeHtml(ch.name)}" data-method="${m}" data-referer="${ch.referer || ''}" data-cat="${catKey}" data-idx="${idx}"><span>${ch.name}${badge}</span><button class="fav-btn" onclick="event.stopPropagation();fav('${escapeHtml(ch.url)}','${escapeHtml(ch.name)}')">${star}</button></div>`;
@@ -568,22 +605,60 @@ function attachChannelEvents() {
     });
   });
 }
+
+// ========== PLAY FUNKTION MED AUDIO-STÖD ==========
 function play(url, name, method, referer) {
   if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
   cur = { url, name, method, referer };
   document.getElementById('ch-title').textContent = name;
   destroyPlayers();
   const wrap = document.getElementById('vwrap');
+
+  // ----- AUDIO (direkta radio-streams: MP3, AAC, Icecast) -----
+  if (method === 'audio') {
+    if (!jsEnabled) {
+      window.open(url, '_blank');
+      wrap.innerHTML = `<div class="error-msg"><h3>🔗 Öppnade i ny flik</h3></div>`;
+      render(curFilter, curSub);
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="radio-player">
+        <div class="radio-icon">📻</div>
+        <div class="radio-name">${escapeHtml(name)}</div>
+        <div class="radio-visualizer">
+          <div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div>
+          <div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div>
+          <div class="radio-bar"></div><div class="radio-bar"></div>
+        </div>
+        <audio id="vplayer" controls autoplay class="radio-audio">
+          <source src="${escapeHtml(url)}">
+          Din webbläsare stödjer inte audio.
+        </audio>
+        <div class="radio-status">🔴 LIVE · RADIO STREAM</div>
+      </div>`;
+    const aud = document.getElementById('vplayer');
+    aud.volume = 1.0;
+    aud.play().catch(() => {
+      wrap.querySelector('.radio-status').textContent = '⚠️ Tryck Play för att starta';
+    });
+    render(curFilter, curSub);
+    return;
+  }
+
+  // ----- IFRAME (webbsidor / inbyggda spelare) -----
   if (method === 'iframe') {
     if (!jsEnabled) {
       window.open(url, '_blank');
       wrap.innerHTML = `<div class="error-msg"><h3>🔗 Öppnade i ny flik</h3></div>`;
     } else {
-      wrap.innerHTML = `<iframe src="${url}" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>`;
+      wrap.innerHTML = `<iframe src="${escapeHtml(url)}" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>`;
     }
     render(curFilter, curSub);
     return;
   }
+
+  // ----- HLS / standard video -----
   wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
   const vid = document.getElementById('vplayer');
   if (Hls.isSupported() && jsEnabled) {
@@ -591,10 +666,17 @@ function play(url, name, method, referer) {
     hlsInst.loadSource(url);
     hlsInst.attachMedia(vid);
     hlsInst.on(Hls.Events.MANIFEST_PARSED, () => vid.play().catch(()=>{}));
-    hlsInst.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) { if (d.type === Hls.ErrorTypes.NETWORK_ERROR) setTimeout(()=>{ if(hlsInst) hlsInst.startLoad(); },2000); else destroyPlayers(); } });
+    hlsInst.on(Hls.Events.ERROR, (_, d) => {
+      if (d.fatal) {
+        if (d.type === Hls.ErrorTypes.NETWORK_ERROR) setTimeout(()=>{ if(hlsInst) hlsInst.startLoad(); },2000);
+        else destroyPlayers();
+      }
+    });
   } else {
     vid.src = url;
-    vid.play().catch(()=>{ wrap.innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte spela</h3><p>Prova att aktivera JS eller använd iframe-kanaler.</p></div>`; });
+    vid.play().catch(()=>{
+      wrap.innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte spela</h3><p>Prova att aktivera JS eller använd iframe-kanaler.</p></div>`;
+    });
   }
   render(curFilter, curSub);
 }
@@ -701,49 +783,21 @@ function updateDateByCalendar() {
   const cal = document.getElementById('calendarSelect').value;
   const now = new Date();
   let formatted = '';
-
   try {
     if (cal === 'gregorian') {
-      formatted = now.toLocaleDateString('sv-SE', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-
+      formatted = now.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     } else if (cal === 'islamic') {
-      const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        weekday: 'long'
-      }).format(now);
-      const hijriEn = new Intl.DateTimeFormat('en-u-ca-islamic', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      }).format(now);
+      const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' }).format(now);
+      const hijriEn = new Intl.DateTimeFormat('en-u-ca-islamic', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
       formatted = `🕌 ${hijriDate} (${hijriEn})`;
-
     } else if (cal === 'iranian') {
-      const persianDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        weekday: 'long'
-      }).format(now);
-      const persianEn = new Intl.DateTimeFormat('en-u-ca-persian', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      }).format(now);
+      const persianDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' }).format(now);
+      const persianEn = new Intl.DateTimeFormat('en-u-ca-persian', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
       formatted = `🇮🇷 ${persianDate} (${persianEn})`;
     }
   } catch (e) {
     formatted = now.toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    console.warn('Kalender ej stödd av webbläsaren:', e);
   }
-
   document.getElementById('dateDisplay').innerHTML = formatted;
 }
 
@@ -775,7 +829,7 @@ async function fetchWeather() {
       else if (weatherCode === 3) icon = '☁️';
       document.getElementById('weatherInfo').innerHTML = `${icon} ${temp}°C   💨 ${wind} m/s  | ${loc.name}, ${loc.country}`;
     } else throw new Error('Väderdata saknas');
-  } catch(err) { document.getElementById('weatherInfo').innerHTML = `❌ ${err.message}`; console.error(err); }
+  } catch(err) { document.getElementById('weatherInfo').innerHTML = `❌ ${err.message}`; }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -785,6 +839,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDateByCalendar();
   fetchWeather();
   setInterval(updateDateByCalendar, 60000);
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dd-wrap')) document.querySelectorAll('.dropdown-menu').forEach(d=>d.classList.remove('show'));
+  });
 });
 render(null, 'all');
 </script>
