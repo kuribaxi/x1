@@ -215,6 +215,35 @@
     .fs-nav-btn:hover { background: #4ecca3; color: #0a1c2a; transform: scale(1.1); border-color: #4ecca3; }
     .fs-nav-label { font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 20px; max-width: 90px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; backdrop-filter: blur(4px); }
 
+    /* ===== TV / LJUD MODE SWITCHER ===== */
+    .mode-switcher {
+      display: none; /* visas via JS när kanalen är HLS/direkt */
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 40px;
+      padding: 4px 6px;
+      border: 1px solid #4ecca355;
+    }
+    .mode-switcher.visible { display: flex; }
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: #aaa;
+      padding: 5px 13px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      transition: all 0.2s;
+    }
+    .mode-btn.active {
+      background: #4ecca3;
+      color: #0a1c2a;
+    }
+    .mode-btn:hover:not(.active) { background: rgba(78,204,163,0.2); color: #fff; }
+
     /* Radio Player Styles */
     .radio-player {
       display: flex;
@@ -247,6 +276,62 @@
     .radio-bar:nth-child(8) { animation-delay: 0.1s; }
     @keyframes barAnim { from { height: 6px; opacity:0.4; } to { height: 36px; opacity:1; } }
     .radio-status { font-size: 0.82rem; opacity: 0.65; letter-spacing: 1px; }
+
+    /* ===== LJUD-LÄGE (HLS → audio only) ===== */
+    .audio-only-player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 24px;
+      background: radial-gradient(ellipse at 50% 40%, #0e2a1e 0%, #060f14 100%);
+      padding: 30px;
+    }
+    .audio-only-icon {
+      font-size: 5rem;
+      animation: spin-slow 8s linear infinite;
+      filter: drop-shadow(0 0 18px #4ecca388);
+    }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .audio-only-name { font-size: 1.35rem; font-weight: bold; color: #4ecca3; text-shadow: 0 0 12px #4ecca355; text-align: center; }
+    .audio-only-label {
+      font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+      color: #4ecca3aa; background: #0f2a1e; padding: 4px 14px; border-radius: 20px;
+      border: 1px solid #4ecca344;
+    }
+    .audio-visualizer {
+      display: flex; align-items: flex-end; gap: 5px; height: 50px; margin: 4px 0;
+    }
+    .audio-bar {
+      width: 6px; border-radius: 4px; background: linear-gradient(to top, #4ecca3, #a8ffde);
+      animation: barAnim 0.7s ease-in-out infinite alternate;
+    }
+    .audio-bar:nth-child(1)  { animation-delay: 0.00s; }
+    .audio-bar:nth-child(2)  { animation-delay: 0.07s; }
+    .audio-bar:nth-child(3)  { animation-delay: 0.14s; }
+    .audio-bar:nth-child(4)  { animation-delay: 0.21s; }
+    .audio-bar:nth-child(5)  { animation-delay: 0.28s; }
+    .audio-bar:nth-child(6)  { animation-delay: 0.35s; }
+    .audio-bar:nth-child(7)  { animation-delay: 0.28s; }
+    .audio-bar:nth-child(8)  { animation-delay: 0.21s; }
+    .audio-bar:nth-child(9)  { animation-delay: 0.14s; }
+    .audio-bar:nth-child(10) { animation-delay: 0.07s; }
+    .audio-only-controls {
+      display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
+    }
+    .audio-vol-wrap {
+      display: flex; align-items: center; gap: 8px;
+      background: #0f2a1e; padding: 7px 16px; border-radius: 30px;
+      border: 1px solid #4ecca344;
+    }
+    .audio-vol-wrap input[type=range] {
+      accent-color: #4ecca3; width: 110px; cursor: pointer;
+    }
+    .audio-info-badge {
+      background: #0f2a1e; border: 1px solid #4ecca344; border-radius: 20px;
+      padding: 5px 14px; font-size: 0.75rem; color: #4ecca3aa; letter-spacing: 1px;
+    }
   </style>
 </head>
 <body>
@@ -301,7 +386,30 @@
 
 <div class="container">
   <aside class="channel-list" id="channel-list"><button class="close-btn" onclick="toggleList()">✕ Stäng</button><div id="ch-container"></div></aside>
-  <main class="video-container"><div class="video-header"><div><div class="video-title" id="ch-title">📡 Välj en kanal</div><div class="ua-selector">UA: <select id="ua-select" onchange="if(cur) reload()"><option value="">Auto (standard)</option><option value="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)">📱 iPhone</option><option value="Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X)">📲 iPad</option><option value="Mozilla/5.0 (Linux; Android 10)">🤖 Android</option></select></div></div><div class="video-controls"><button class="btn" onclick="toggleList()">📺 Kanaler</button><button class="btn" onclick="pip()">⧉ PiP</button><button class="btn" onclick="fs()">⛶ Fullskärm</button><button class="btn" onclick="reload()">↻ Ladda om</button><button class="btn" id="tv-btn" onclick="toggleTV()">📺 TV-läge</button><button class="btn" id="jsToggleBtn" onclick="toggleJSengine()">⚙️ JS PÅ</button></div></div><div class="video-wrapper" id="vwrap"><div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning • Tryck JS AV om kanalen inte startar</p></div></div></main>
+  <main class="video-container">
+    <div class="video-header">
+      <div>
+        <div class="video-title" id="ch-title">📡 Välj en kanal</div>
+        <div class="ua-selector">UA: <select id="ua-select" onchange="if(cur) reload()"><option value="">Auto (standard)</option><option value="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)">📱 iPhone</option><option value="Mozilla/5.0 (iPad; CPU OS 14_0 like Mac OS X)">📲 iPad</option><option value="Mozilla/5.0 (Linux; Android 10)">🤖 Android</option></select></div>
+      </div>
+      <div class="video-controls">
+        <!-- TV / Ljud switcher — visas bara för direkta HLS-kanaler -->
+        <div class="mode-switcher" id="mode-switcher">
+          <button class="mode-btn active" id="mode-tv" onclick="setPlayMode('tv')">📺 TV</button>
+          <button class="mode-btn" id="mode-audio" onclick="setPlayMode('audio')">🎧 Ljud</button>
+        </div>
+        <button class="btn" onclick="toggleList()">📺 Kanaler</button>
+        <button class="btn" onclick="pip()">⧉ PiP</button>
+        <button class="btn" onclick="fs()">⛶ Fullskärm</button>
+        <button class="btn" onclick="reload()">↻ Ladda om</button>
+        <button class="btn" id="tv-btn" onclick="toggleTV()">📺 TV-läge</button>
+        <button class="btn" id="jsToggleBtn" onclick="toggleJSengine()">⚙️ JS PÅ</button>
+      </div>
+    </div>
+    <div class="video-wrapper" id="vwrap">
+      <div class="error-msg"><h3>👈 Välj en kanal</h3><p style="font-size:13px;margin-top:10px;">✨ Dra för att ändra ordning • Tryck JS AV om kanalen inte startar</p></div>
+    </div>
+  </main>
 </div>
 
 <script>
@@ -477,7 +585,7 @@ const karwanRaw = [
   { name: 'Ava TV', url: 'https://karwan.tv/ava-tv', method:'iframe', color:'beige', subgroup:'beige' }
 ];
 
-// ========== RADIO — method:'audio' för direkta streams, method:'hls' för M3U8 ==========
+// ========== RADIO ==========
 const RadioRaw = [
   { name: 'Rudaw Radio',    url: 'https://radio.rudaw.net/stream/live',                                      method:'audio', color:'cyan' },
   { name: 'Kurdsat Radio',  url: 'https://stream-146.zeno.fm/aky4f7r29f8uv',                                 method:'audio', color:'cyan' },
@@ -488,6 +596,7 @@ const RadioRaw = [
   { name: 'Ava Radio',      url: 'https://ava.holan.it.com/;?type=http&nocache=1',                           method:'audio', color:'cyan' }
 ];
 
+// ========== ORDER / STORAGE ==========
 function loadOrder(cat) { try { const o = localStorage.getItem('order_'+cat); return o ? JSON.parse(o) : null; } catch(e) { return null; } }
 function saveOrder(cat, arr) { localStorage.setItem('order_'+cat, JSON.stringify(arr.map(c=>c.url))); }
 function applyStoredOrder(arr, key) {
@@ -511,8 +620,14 @@ const channels = {
 };
 function reorderCategory(cat, newArr) { channels[cat] = newArr; saveOrder(cat, newArr); }
 
+// ========== STATE ==========
 let hlsInst = null, dashInst = null, cur = null, favs = [], jsEnabled = true, tvMode = false, curFilter = null, curSub = 'all';
+// playMode: 'tv' = normalt video, 'audio' = ljud-only läge (för HLS-kanaler)
+let playMode = 'tv';
+
 try { favs = JSON.parse(localStorage.getItem('xomfavs') || '[]'); } catch(e) { favs = []; }
+try { playMode = localStorage.getItem('xom_playmode') || 'tv'; } catch(e) {}
+
 function destroyPlayers() { if (hlsInst) { hlsInst.destroy(); hlsInst = null; } if (dashInst) { dashInst.reset(); dashInst = null; } }
 function reload() { if (cur) play(cur.url, cur.name, cur.method, cur.referer); }
 function pip() { const v = document.getElementById('vplayer'); if (v && document.pictureInPictureEnabled) { document.pictureInPictureElement ? document.exitPictureInPicture() : v.requestPictureInPicture().catch(()=>{}); } }
@@ -543,6 +658,82 @@ function fav(url, name) {
 }
 function toggleList() { document.getElementById('channel-list').classList.toggle('show'); }
 
+// ========== TV / LJUD MODE SWITCHER ==========
+function isDirectStream(method) {
+  // Direkta streams som stöder ljud-läge: hls (standard), audio, hls-radio
+  return !method || method === 'hls' || method === 'hls-radio';
+}
+
+function setPlayMode(mode) {
+  playMode = mode;
+  localStorage.setItem('xom_playmode', mode);
+  document.getElementById('mode-tv').classList.toggle('active', mode === 'tv');
+  document.getElementById('mode-audio').classList.toggle('active', mode === 'audio');
+  if (cur) play(cur.url, cur.name, cur.method, cur.referer);
+}
+
+function showModeSwitcher(show) {
+  const sw = document.getElementById('mode-switcher');
+  sw.classList.toggle('visible', show);
+}
+
+function updateModeSwitcherUI() {
+  document.getElementById('mode-tv').classList.toggle('active', playMode === 'tv');
+  document.getElementById('mode-audio').classList.toggle('active', playMode === 'audio');
+}
+
+// ========== AUDIO-ONLY PLAYER (för HLS i ljud-läge) ==========
+function renderAudioOnlyPlayer(url, name) {
+  const wrap = document.getElementById('vwrap');
+  wrap.innerHTML = `
+    <div class="audio-only-player">
+      <div class="audio-only-icon">💿</div>
+      <div class="audio-only-name">${escapeHtml(name)}</div>
+      <div class="audio-only-label">🎧 LJUD-LÄGE · HLS STREAM</div>
+      <div class="audio-visualizer">
+        <div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div>
+        <div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div>
+        <div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+      </div>
+      <div class="audio-only-controls">
+        <div class="audio-vol-wrap">
+          🔊 <input type="range" id="audioVolSlider" min="0" max="1" step="0.05" value="1">
+        </div>
+        <div class="audio-info-badge" id="audioStatusBadge">⏳ Ansluter...</div>
+      </div>
+      <video id="vplayer" style="display:none;" autoplay></video>
+    </div>`;
+
+  const vid = document.getElementById('vplayer');
+  const badge = document.getElementById('audioStatusBadge');
+  const volSlider = document.getElementById('audioVolSlider');
+
+  volSlider.addEventListener('input', () => { if (vid) vid.volume = parseFloat(volSlider.value); });
+
+  if (Hls.isSupported() && jsEnabled) {
+    hlsInst = new Hls({ enableWorker: true });
+    hlsInst.loadSource(url);
+    hlsInst.attachMedia(vid);
+    hlsInst.on(Hls.Events.MANIFEST_PARSED, () => {
+      vid.play().catch(() => { badge.textContent = '▶️ Tryck Play i webbläsaren'; });
+      badge.textContent = '🔴 LIVE · Spelar';
+    });
+    hlsInst.on(Hls.Events.ERROR, (_, d) => {
+      if (d.fatal) {
+        badge.textContent = '⚠️ Fel – försöker igen...';
+        if (d.type === Hls.ErrorTypes.NETWORK_ERROR) setTimeout(() => { if (hlsInst) hlsInst.startLoad(); }, 2000);
+        else destroyPlayers();
+      }
+    });
+  } else {
+    vid.src = url;
+    vid.play().catch(() => { badge.textContent = '⚠️ Kunde inte spela'; });
+    badge.textContent = '🔴 LIVE';
+  }
+}
+
+// ========== RENDER ==========
 function render(filter, sub) {
   curFilter = filter; curSub = sub || 'all';
   let html = '';
@@ -568,18 +759,23 @@ function render(filter, sub) {
   attachDragListeners();
   attachChannelEvents();
 }
+
 function row(ch, idx, catKey) {
   const m = ch.method || 'hls';
   let badge = '';
   if (m === 'iframe') badge = ' <span class="tag">📺 live</span>';
   else if (m === 'audio') badge = ' <span class="tag">🎙️ radio</span>';
+  else badge = ' <span class="tag">📡 hls</span>';
   const isFav = favs.some(f => f.url === ch.url);
   const star = isFav ? '★' : '☆';
   const favClass = isFav ? 'fav-btn is-fav' : 'fav-btn';
   const activeClass = (cur && cur.url === ch.url) ? 'active' : '';
   return `<div class="channel-item ${ch.color} ${activeClass}" draggable="true" data-url="${escapeHtml(ch.url)}" data-name="${escapeHtml(ch.name)}" data-method="${m}" data-referer="${ch.referer || ''}" data-cat="${catKey}" data-idx="${idx}"><span>${ch.name}${badge}</span><button class="${favClass}" onclick="event.stopPropagation();fav('${escapeHtml(ch.url)}','${escapeHtml(ch.name)}')">${star}</button></div>`;
 }
+
 function escapeHtml(str) { return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+
+// ========== DRAG ==========
 function attachDragListeners() {
   document.querySelectorAll('.channel-item[draggable="true"]').forEach(el => {
     el.addEventListener('dragstart', dragStart);
@@ -610,6 +806,7 @@ function drop(e) {
   cleanupDrag();
 }
 function cleanupDrag() { if (dragSource) dragSource.style.opacity = ''; document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('drag-over')); dragSource = null; }
+
 function attachChannelEvents() {
   document.querySelectorAll('.channel-item').forEach(el => {
     el.addEventListener('click', function(ev) {
@@ -619,13 +816,18 @@ function attachChannelEvents() {
   });
 }
 
-// ========== PLAY FUNKTION MED AUDIO-STÖD ==========
+// ========== PLAY ==========
 function play(url, name, method, referer) {
   if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
   cur = { url, name, method, referer };
   document.getElementById('ch-title').textContent = name;
   destroyPlayers();
   const wrap = document.getElementById('vwrap');
+
+  // Visa/dölj mode-switcher — bara för direkta HLS-kanaler (ej iframe, ej audio-radio)
+  const isDirect = isDirectStream(method);
+  showModeSwitcher(isDirect);
+  if (isDirect) updateModeSwitcherUI();
 
   // ----- AUDIO (direkta radio-streams: MP3, AAC, Icecast) -----
   if (method === 'audio') {
@@ -659,7 +861,7 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // ----- IFRAME (webbsidor / inbyggda spelare) -----
+  // ----- IFRAME -----
   if (method === 'iframe') {
     if (!jsEnabled) {
       window.open(url, '_blank');
@@ -671,7 +873,15 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // ----- HLS / standard video -----
+  // ----- HLS — TV-LÄGE eller LJUD-LÄGE -----
+  if (playMode === 'audio') {
+    // Ljud-only: video gömd, bara HLS-ljud spelas
+    renderAudioOnlyPlayer(url, name);
+    render(curFilter, curSub);
+    return;
+  }
+
+  // TV-läge (standard video)
   wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
   const vid = document.getElementById('vplayer');
   if (Hls.isSupported() && jsEnabled) {
@@ -688,12 +898,13 @@ function play(url, name, method, referer) {
   } else {
     vid.src = url;
     vid.play().catch(()=>{
-      wrap.innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte spela</h3><p>Prova att aktivera JS eller använd iframe-kanaler.</p></div>`;
+      wrap.innerHTML = `<div class="error-msg"><h3>⚠️ Kunde inte spela</h3><p>Prova att aktivera JS eller byt till Ljud-läge.</p></div>`;
     });
   }
   render(curFilter, curSub);
 }
 
+// ========== FULLSCREEN NAV ==========
 function getAllChannels() {
   if (curFilter && channels[curFilter]) {
     if (curFilter === 'karwan' && curSub !== 'all') return channels.karwan.filter(c => c.subgroup === curSub);
@@ -735,6 +946,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { fsNavChannel(-1); showFsNav(); }
   if (e.key === 'ArrowRight') { fsNavChannel(1); showFsNav(); }
 });
+
+// ========== NAV FILTER ==========
 function showAll(btn) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(null,'all'); }
 function showFavs(btn) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render('__favs__','all'); }
 function filterDirect(btn, cat) { document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); render(cat,'all'); }
@@ -846,6 +1059,7 @@ async function fetchWeather() {
   } catch(err) { document.getElementById('weatherInfo').innerHTML = `❌ ${err.message}`; }
 }
 
+// ========== INIT ==========
 document.addEventListener('DOMContentLoaded', () => {
   initClock();
   document.getElementById('calendarSelect').addEventListener('change', updateDateByCalendar);
@@ -856,7 +1070,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.dd-wrap')) document.querySelectorAll('.dropdown-menu').forEach(d=>d.classList.remove('show'));
   });
+  // Sätt korrekt initial mode-btn state
+  updateModeSwitcherUI();
 });
+
 render(null, 'all');
 </script>
 </body>
