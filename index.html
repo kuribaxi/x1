@@ -615,11 +615,19 @@ var diniRaw = [
   { name: 'Shna Quran', url: 'https://karwan.tv/shna-quran/', method:'iframe', color:'grey', subgroup:'grey' },
   { name: 'Farmoda TV', url: 'https://karwan.tv/farmoda-tv', method:'iframe', color:'green', subgroup:'green' },
 ];
-var karwanRaw = [
+
+/* FIX: denna lista saknades helt i originalfilen, vilket gjorde att
+   "sportRaw.slice()" nedan kastade ett ReferenceError och stoppade
+   HELA skriptet (inga kanaler, ingen klocka, inga klick fungerade). */
+var sportRaw = [
   { name: 'MMN Sport', url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8', color: 'red' },
   { name: 'Shna TV sport', url: 'https://karwan.tv/shna-tv-3/', method:'iframe', color:'yellow', subgroup:'yellow' },
-  { name: 'MMN Documentary', url: 'http://mmn.mypsx.net:1935/live/mmnhddocumentary/playlist.m3u8', color: 'red' },
   { name: 'Sport TV', url: 'https://karwan.tv/sport-tv/', method:'iframe', color:'yellow', subgroup:'yellow' },
+  { name: 'NRT sport', url: 'https://karwan.tv/nrt-sport/', method:'iframe', color:'green', subgroup:'green' },
+];
+
+var karwanRaw = [
+  { name: 'MMN Documentary', url: 'http://mmn.mypsx.net:1935/live/mmnhddocumentary/playlist.m3u8', color: 'red' },
   { name: 'Ronya tv', url: 'https://karwan.tv/ranya-city/', method:'iframe', color:'blue', subgroup:'blue' },
   { name: 'RED Tv', url: 'https://karwan.tv/red-tv/', method:'iframe', color:'blue', subgroup:'blue' },
   { name: 'Hormzyar tv', url: 'https://karwan.tv/hormzyar-tv/', method:'iframe', color:'blue', subgroup:'blue' },
@@ -635,12 +643,12 @@ var karwanRaw = [
   { name: 'Geryan tv', url: 'https://karwan.tv/graryan-tv/', method:'iframe', color:'pink', subgroup:'pink' },
   { name: 'J media tv', url: 'https://karwan.tv/j-media/', method:'iframe', color:'grey', subgroup:'grey' },
   { name: 'Zed TV Plus', url: 'https://karwan.tv/zed-tv-plus', method:'iframe', color:'grey', subgroup:'grey' },
- 
+
   { name: 'Shna TV', url: 'https://karwan.tv/shna-tv', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Kurd 7', url: 'https://karwan.tv/kurd-7', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Gewher tv', url: 'https://karwan.tv/graryan-tv/', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Naghshi media TV', url: 'https://karwan.tv/naqshi-media/', method:'iframe', color:'yellow', subgroup:'yellow' },
-  
+
   { name: 'Kurdana TV', url: 'https://karwan.tv/kurdana-tv', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Next TV', url: 'https://karwan.tv/next-tv/', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Kanal 21', url: 'https://karwan.tv/kanali-21', method:'iframe', color:'yellow', subgroup:'yellow' },
@@ -648,12 +656,11 @@ var karwanRaw = [
   { name: 'Niroj tv', url: 'https://karwan.tv/niroj-tv/', method:'iframe', color:'maroon', subgroup:'maroon' },
   { name: 'Strek tv', url: 'https://karwan.tv/sterk-tv/', method:'iframe', color:'maroon', subgroup:'maroon' },
   { name: 'Zed TV', url: 'https://karwan.tv/zed-tv', method:'iframe', color:'maroon', subgroup:'maroon' },
-  { name: 'NRT sport', url: 'https://karwan.tv/nrt-sport/', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Mihrab TV', url: 'https://karwan.tv/mihrab-tv', method:'iframe', color:'green', subgroup:'green' },
   { name: 'TV Kurdi deng', url: 'https://karwan.tv/tv-kurdi/', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Waar Hawler', url: 'https://karwan.tv/waar-tv/', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Shar TV', url: 'https://karwan.tv/shar-tv', method:'iframe', color:'green', subgroup:'green' },
-  
+
   { name: 'Welat TV', url: 'https://karwan.tv/welat-tv/', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Aro Family', url: 'https://karwan.tv/aro-family', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Zagros24 TV', url: 'https://karwan.tv/zagros-24/', method:'iframe', color:'brown', subgroup:'brown' },
