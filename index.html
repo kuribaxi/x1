@@ -551,6 +551,8 @@ var akhbarRaw = [
   { name: 'Komala', url: 'https://komhls.wns.live/hls/stream.m3u8', color: 'green', subgroup:'news' },
   { name: 'Payam TV', url: 'https://media2.streambrothers.com:1936/8218/8218/chunklist_w1239498607.m3u8', color: 'green', subgroup:'news' },
   { name: 'Kurdistan24', url: 'https://www.kurdistan24.net/en/live', method:'iframe', color: 'orange', subgroup:'news' },
+  { name: 'Nuce tv', url: 'https://karwan.tv/nuce-tv/', method:'iframe', color:'pink', subgroup:'orange' },
+  { name: 'Welat TV', url: 'https://karwan.tv/welat-tv/', method:'iframe', color:'green', subgroup:'orange' },
   { name: 'Kurdistan', url: 'https://www.kurdistan.tv/', method:'iframe', color: 'orange' },
   { name: 'Ava TV', url: 'https://www.ava.news/livewatch', method:'iframe', color: 'orange', subgroup:'news' },
   { name: 'Speda', url: 'https://www.speda.net/tv1/', method:'iframe', color: 'orange', subgroup:'news' },
@@ -589,20 +591,22 @@ var filmRaw = [
   { name: 'Barin Movies', url: 'https://karwan.tv/barin-movies/', method:'iframe', color:'yellow', subgroup:'yellow' },
   { name: 'Bnar Movies', url: 'https://karwan.tv/bnar-movies', method:'iframe', color:'purple', subgroup:'yellow' },
   { name: 'Bnar Action TV', url: 'https://karwan.tv/bnar-action/', method:'iframe', color:'purple', subgroup:'yellow' },
+  { name: 'RED Tv', url: 'https://karwan.tv/red-tv/', method:'iframe', color:'blue', subgroup:'yellow' },
 ];
 var diniRaw = [
   { name: 'Amozhgary', url: 'https://app-live.org/live/3268334b/index.m3u8', color: 'teal' },
-  { name: 'Amozhgary academy', url: 'https://karwan.tv/amozhgary-academy/', method:'iframe', color:'blue', subgroup:'yellow' },
-  { name: 'Ashna Quran TV', url: 'https://karwan.tv/ashna-quran/', method:'iframe', color:'beige', subgroup:'yellow' },
   { name: 'MMN Quran', url: 'http://mmn.mypsx.net:1935/live/mmnhdquran/playlist.m3u8', color: 'teal' },
   { name: 'Eman TV', url: 'https://avr.host247.net/live/emantv/tracks-v1a1/mono.m3u8', color: 'teal' },
-  { name: 'Spi Quran', url: 'https://karwan.tv/spi-quran/', method:'iframe', color:'yellow', subgroup:'yellow' },
-  { name: 'Spi TV', url: 'https://karwan.tv/spi-tv/', method:'iframe', color:'pink', subgroup:'yellow' },
-  { name: 'Ashti QuranTV', url: 'https://karwan.tv/ashti-quran/', method:'iframe', color:'pink', subgroup:'yellow' },
-  { name: 'Ashti Family', url: 'https://karwan.tv/ashti-family/', method:'iframe', color:'pink', subgroup:'yellow' },
-  { name: 'IMK Quran TV', url: 'https://karwan.tv/imk-quran/', method:'iframe', color:'pink', subgroup:'yellow' },
-  { name: 'Shna Quran', url: 'https://karwan.tv/shna-quran/', method:'iframe', color:'grey', subgroup:'yellow' },
-  { name: 'Farmoda TV', url: 'https://karwan.tv/farmoda-tv', method:'iframe', color:'green', subgroup:'yellow' },
+  { name: 'Amozhgary academy', url: 'https://karwan.tv/amozhgary-academy/', method:'iframe', color:'purple' },
+  { name: 'Ashna Quran TV', url: 'https://karwan.tv/ashna-quran/', method:'iframe', color:'purple' },
+  { name: 'Spi Quran', url: 'https://karwan.tv/spi-quran/', method:'iframe', color:'purple' },
+  { name: 'Spi TV', url: 'https://karwan.tv/spi-tv/', method:'iframe', color:'purple' },
+  { name: 'Ashti QuranTV', url: 'https://karwan.tv/ashti-quran/', method:'iframe', color:'purple' },
+  { name: 'Ashti Family', url: 'https://karwan.tv/ashti-family/', method:'iframe', color:'purple' },
+  { name: 'IMK Quran TV', url: 'https://karwan.tv/imk-quran/', method:'iframe', color:'purple' },
+  { name: 'Shna Quran', url: 'https://karwan.tv/shna-quran/', method:'iframe', color:'purple' },
+  { name: 'Farmoda TV', url: 'https://karwan.tv/farmoda-tv', method:'iframe', color:'purple' },
+  { name: 'One plus', url: 'https://karwan.tv/one-plus/', method:'iframe', color:'purple' },
 ];
 
 /* FIX: denna lista saknades helt i originalfilen, vilket gjorde att
@@ -620,12 +624,12 @@ var karwanRaw = [
   { name: 'Ronya tv', url: 'https://karwan.tv/ranya-city/', method:'iframe', color:'blue', subgroup:'blue' },
   { name: 'RED Tv', url: 'https://karwan.tv/red-tv/', method:'iframe', color:'blue', subgroup:'blue' },
   { name: 'Hormzyar tv', url: 'https://karwan.tv/hormzyar-tv/', method:'iframe', color:'blue', subgroup:'blue' },
-  { name: 'One plus', url: 'https://karwan.tv/one-plus/', method:'iframe', color:'purple', subgroup:'purple' },
+  
   { name: 'Shar TV', url: 'https://karwan.tv/shar-tv/', method:'iframe', color:'purple', subgroup:'purple' },
   { name: 'Bask', url: 'https://karwan.tv/bask-tv/', method:'iframe', color:'purple', subgroup:'purple' },
   { name: 'MMN Show', url: 'https://karwan.tv/mmn-show', method:'iframe', color:'pink', subgroup:'pink' },
   { name: 'Ronahi tv', url: 'https://karwan.tv/ronahi-tv/', method:'iframe', color:'pink', subgroup:'pink' },
-  { name: 'Nuce tv', url: 'https://karwan.tv/nuce-tv/', method:'iframe', color:'pink', subgroup:'pink' },
+  
   { name: 'Barin Family', url: 'https://karwan.tv/barin-family', method:'iframe', color:'pink', subgroup:'pink' },
   { name: 'Halabja TV', url: 'https://karwan.tv/halabja-tv', method:'iframe', color:'pink', subgroup:'pink' },
   { name: 'Kurdmax TV', url: 'https://karwan.tv/kurdmax-tv', method:'iframe', color:'pink', subgroup:'pink' },
@@ -650,7 +654,7 @@ var karwanRaw = [
   { name: 'Waar Hawler', url: 'https://karwan.tv/waar-tv/', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Shar TV', url: 'https://karwan.tv/shar-tv', method:'iframe', color:'green', subgroup:'green' },
 
-  { name: 'Welat TV', url: 'https://karwan.tv/welat-tv/', method:'iframe', color:'green', subgroup:'green' },
+  
   { name: 'Aro Family', url: 'https://karwan.tv/aro-family', method:'iframe', color:'green', subgroup:'green' },
   { name: 'Zagros24 TV', url: 'https://karwan.tv/zagros-24/', method:'iframe', color:'brown', subgroup:'brown' },
   { name: 'Znar TV', url: 'https://karwan.tv/znar-tv/', method:'iframe', color:'magenta', subgroup:'magenta' },
