@@ -408,6 +408,24 @@
       background: #0f2a1e; border: 1px solid #4ecca344; border-radius: 20px;
       padding: 5px 14px; font-size: 0.75rem; color: #4ecca3aa; letter-spacing: 1px; margin: 4px;
     }
+
+    /* ===== IFRAME WRAPPER + "Öppna i nytt fönster" knapp ===== */
+    .iframe-wrap { position: relative; width: 100%; height: 100%; }
+    .iframe-open-btn {
+      position: absolute; top: 12px; right: 12px; z-index: 20;
+      background: rgba(0,0,0,0.7); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      color: #4ecca3; border: 1px solid #4ecca3; border-radius: 30px;
+      padding: 7px 16px; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      -webkit-transition: 0.2s; transition: 0.2s;
+    }
+    .iframe-open-btn:hover { background: #4ecca3; color: #0a1c2a; -webkit-transform: translateY(-1px); transform: translateY(-1px); }
+    .iframe-hint {
+      position: absolute; bottom: 12px; left: 50%; -webkit-transform: translateX(-50%); transform: translateX(-50%);
+      z-index: 20; background: rgba(0,0,0,0.65); color: #ffbb99; font-size: 0.72rem;
+      padding: 5px 14px; border-radius: 30px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      max-width: 90%; text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -458,6 +476,7 @@
   <button class="nav-btn" id="btn-sport" onclick="filterDirect(this,'sport')">Sport</button>
   <div class="dd-wrap"><button class="nav-btn" id="btn-karwan" onclick="toggleDD(event,'dd-karwan')">Karwan TV</button><div class="dropdown-menu" id="dd-karwan"><div class="dropdown-item" onclick="filterSub('karwan','all')">Alla Karwan</div><div class="dropdown-item" onclick="filterSub('karwan','blue')">Kids</div><div class="dropdown-item" onclick="filterSub('karwan','purple')">Movie</div><div class="dropdown-item" onclick="filterSub('karwan','pink')">Dubbad</div><div class="dropdown-item" onclick="filterSub('karwan','grey')">Blandad</div><div class="dropdown-item" onclick="filterSub('karwan','yellow')">Music</div><div class="dropdown-item" onclick="filterSub('karwan','maroon')">Dokumentär</div><div class="dropdown-item" onclick="filterSub('karwan','green')">Dini</div><div class="dropdown-item" onclick="filterSub('karwan','brown')">Kultur</div><div class="dropdown-item" onclick="filterSub('karwan','magenta')">Srodi Dini</div><div class="dropdown-item" onclick="filterSub('karwan','beige')">Nyhet</div></div></div>
   <button class="nav-btn" id="btn-Radio" onclick="filterDirect(this,'Radio')">Radio</button>
+  <button class="nav-btn" id="btn-verktyg" onclick="filterDirect(this,'verktyg')">Verktyg</button>
 </div>
 
 <div class="container">
@@ -623,9 +642,6 @@ var diniRaw = [
   { name: 'Mihrab TV', url: 'https://karwan.tv/mihrab-tv', method:'iframe', color:'blue' },
 ];
 
-/* FIX: denna lista saknades helt i originalfilen, vilket gjorde att
-   "sportRaw.slice()" nedan kastade ett ReferenceError och stoppade
-   HELA skriptet (inga kanaler, ingen klocka, inga klick fungerade). */
 var sportRaw = [
   { name: 'MMN Sport', url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8', color: 'green' },
   { name: 'Shna TV sport', url: 'https://karwan.tv/shna-tv-3/', method:'iframe', color:'green' },
@@ -647,14 +663,12 @@ var karwanRaw = [
   { name: 'Zed TV Plus', url: 'https://karwan.tv/zed-tv-plus', method:'iframe', color:'grey' },
   { name: 'Shna TV', url: 'https://karwan.tv/shna-tv', method:'iframe', color:'grey' },
   { name: 'TV Kurdi deng', url: 'https://karwan.tv/tv-kurdi/', method:'iframe', color:'grey' },
-  
-  
-  
-  
-  
- 
   { name: 'Kirkuk TV', url: 'https://karwan.tv/kirkuk-tv', method:'iframe', color:'beige', subgroup:'beige' },
 
+];
+
+var verktygRaw = [
+  { name: 'Webbrowser', url: 'https://www.google.com/webhp?igu=1', method:'iframe', color:'orange' },
 ];
 
 var RadioRaw = [
@@ -689,7 +703,8 @@ var channels = {
   dini:   applyStoredOrder(diniRaw.slice(),   'dini'),
   sport:  applyStoredOrder(sportRaw.slice(),  'sport'),
   karwan: applyStoredOrder(karwanRaw.slice(), 'karwan'),
-  Radio:  applyStoredOrder(RadioRaw.slice(),  'Radio')
+  Radio:  applyStoredOrder(RadioRaw.slice(),  'Radio'),
+  verktyg: applyStoredOrder(verktygRaw.slice(), 'verktyg')
 };
 function reorderCategory(cat, newArr) { channels[cat] = newArr; saveOrder(cat, newArr); }
 
@@ -973,13 +988,19 @@ function play(url, name, method, referer) {
   }
 
   // ----- IFRAME -----
+  // FIX: bädda alltid in i en iframe (oavsett globala JS PA/AV-läget) och lägg en
+  // synlig "Öppna i nytt fönster" knapp ovanpå spelaren. Många karwan.tv-sidor
+  // skickar X-Frame-Options/CSP-headers som blockerar inbäddning helt och hållet
+  // — det går inte att kringgå från klientkoden, bara sajten själv kan ändra det.
+  // Knappen ger ett en-klicks alternativ direkt i spelaren, så man slipper toggla
+  // det globala JS-läget för varje kanal som inte går att bädda in.
   if (method === 'iframe') {
-    if (!jsEnabled) {
-      window.open(url, '_blank');
-      wrap.innerHTML = '<div class="error-msg"><h3>Öppnade i ny flik</h3></div>';
-    } else {
-      wrap.innerHTML = '<iframe src="' + escapeHtml(url) + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>';
-    }
+    wrap.innerHTML =
+      '<div class="iframe-wrap">' +
+        '<iframe src="' + escapeHtml(url) + '" allowfullscreen allow="autoplay; fullscreen" referrerpolicy="no-referrer" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>' +
+        '<button class="iframe-open-btn" onclick="window.open(\'' + escapeHtml(url) + '\',\'_blank\')">Öppna i nytt fönster ↗</button>' +
+        '<div class="iframe-hint">Tom skärm? Klicka knappen ovan — sajten blockerar inbäddning.</div>' +
+      '</div>';
     render(curFilter, curSub);
     return;
   }
@@ -1152,7 +1173,6 @@ function updateDateByCalendar() {
   var formatted = '';
   try {
     if (cal === 'gregorian') {
-      // Enkel gregoriansk — alltid säker
       var days = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
       var months = ['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
       formatted = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
