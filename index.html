@@ -489,7 +489,6 @@
 
 <script>
 // ========== POLYFILLS FÖR GAMLA IOS ==========
-// Array.prototype.flat polyfill (saknas i iOS < 12)
 if (!Array.prototype.flat) {
   Array.prototype.flat = function(depth) {
     var d = depth === undefined ? 1 : Math.floor(depth);
@@ -503,14 +502,12 @@ if (!Array.prototype.flat) {
   };
 }
 
-// Object.values polyfill (saknas i iOS < 10.3)
 if (!Object.values) {
   Object.values = function(obj) {
     return Object.keys(obj).map(function(k) { return obj[k]; });
   };
 }
 
-// Array.prototype.findIndex polyfill (saknas i iOS < 9)
 if (!Array.prototype.findIndex) {
   Array.prototype.findIndex = function(predicate) {
     for (var i = 0; i < this.length; i++) {
@@ -520,7 +517,6 @@ if (!Array.prototype.findIndex) {
   };
 }
 
-// Array.prototype.find polyfill
 if (!Array.prototype.find) {
   Array.prototype.find = function(predicate) {
     for (var i = 0; i < this.length; i++) {
@@ -623,9 +619,6 @@ var diniRaw = [
   { name: 'Mihrab TV', url: 'https://karwan.tv/mihrab-tv', method:'iframe', color:'blue' },
 ];
 
-/* FIX: denna lista saknades helt i originalfilen, vilket gjorde att
-   "sportRaw.slice()" nedan kastade ett ReferenceError och stoppade
-   HELA skriptet (inga kanaler, ingen klocka, inga klick fungerade). */
 var sportRaw = [
   { name: 'MMN Sport', url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8', color: 'green' },
   { name: 'Shna TV sport', url: 'https://karwan.tv/shna-tv-3/', method:'iframe', color:'green' },
@@ -647,12 +640,6 @@ var karwanRaw = [
   { name: 'Zed TV Plus', url: 'https://karwan.tv/zed-tv-plus', method:'iframe', color:'grey' },
   { name: 'Shna TV', url: 'https://karwan.tv/shna-tv', method:'iframe', color:'grey' },
   { name: 'TV Kurdi deng', url: 'https://karwan.tv/tv-kurdi/', method:'iframe', color:'grey' },
-  
-  
-  
-  
-  
- 
   { name: 'Kirkuk TV', url: 'https://karwan.tv/kirkuk-tv', method:'iframe', color:'beige', subgroup:'beige' },
 
 ];
@@ -759,6 +746,24 @@ function updateModeSwitcherUI() {
   document.getElementById('mode-audio').classList.toggle('active', playMode === 'audio');
 }
 
+// ========== HEMLIG FLIK (för karwan.tv-länkar) ==========
+// Öppnar länken i en ny flik UTAN att skicka referrer/opener till karwan.tv,
+// så mottagarsidan inte kan se att den kom härifrån ("hemlig" flik).
+function openSecretTab(url) {
+  var w = window.open('', '_blank', 'noopener,noreferrer');
+  if (w) {
+    try {
+      w.opener = null;
+      w.location.href = url;
+    } catch (e) {
+      w.location = url;
+    }
+  } else {
+    // Popup-blockerare - fallback
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+}
+
 // ========== AUDIO-ONLY PLAYER (för HLS i ljud-läge) ==========
 function renderAudioOnlyPlayer(url, name) {
   var wrap = document.getElementById('vwrap');
@@ -844,6 +849,7 @@ function row(ch, idx, catKey) {
   if (m === 'iframe') badge = ' <span class="tag">live</span>';
   else if (m === 'audio') badge = ' <span class="tag">radio</span>';
   else badge = ' <span class="tag">hls</span>';
+  if (ch.url.indexOf('karwan.tv') !== -1) badge += ' <span class="tag">ny flik</span>';
   var isFav = favs.some(function(f){ return f.url === ch.url; });
   var star = isFav ? '&#9733;' : '&#9734;';
   var favClass = isFav ? 'fav-btn is-fav' : 'fav-btn';
@@ -974,6 +980,14 @@ function play(url, name, method, referer) {
 
   // ----- IFRAME -----
   if (method === 'iframe') {
+    // Karwan.tv-kanaler öppnas alltid i en ny "hemlig" flik (utan referrer/opener)
+    // istället för att bäddas in i en iframe på sidan.
+    if (url.indexOf('karwan.tv') !== -1) {
+      openSecretTab(url);
+      wrap.innerHTML = '<div class="error-msg"><h3>' + escapeHtml(name) + ' öppnades i en ny hemlig flik</h3><p style="font-size:13px;margin-top:10px;">Fliken skickar ingen referrer- eller opener-information till karwan.tv.</p></div>';
+      render(curFilter, curSub);
+      return;
+    }
     if (!jsEnabled) {
       window.open(url, '_blank');
       wrap.innerHTML = '<div class="error-msg"><h3>Öppnade i ny flik</h3></div>';
@@ -1006,7 +1020,6 @@ function play(url, name, method, referer) {
       }
     });
   } else if (vid.canPlayType('application/vnd.apple.mpegurl')) {
-    // Native HLS (Safari on iOS)
     vid.src = url;
     vid.play().catch(function(){
       wrap.innerHTML = '<div class="error-msg"><h3>Kunde inte spela</h3><p>Prova att byta till Ljud-läge.</p></div>';
@@ -1152,7 +1165,6 @@ function updateDateByCalendar() {
   var formatted = '';
   try {
     if (cal === 'gregorian') {
-      // Enkel gregoriansk — alltid säker
       var days = ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'];
       var months = ['januari','februari','mars','april','maj','juni','juli','augusti','september','oktober','november','december'];
       formatted = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
