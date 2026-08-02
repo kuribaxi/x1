@@ -501,13 +501,11 @@ if (!Array.prototype.flat) {
     })(this, d);
   };
 }
-
 if (!Object.values) {
   Object.values = function(obj) {
     return Object.keys(obj).map(function(k) { return obj[k]; });
   };
 }
-
 if (!Array.prototype.findIndex) {
   Array.prototype.findIndex = function(predicate) {
     for (var i = 0; i < this.length; i++) {
@@ -516,7 +514,6 @@ if (!Array.prototype.findIndex) {
     return -1;
   };
 }
-
 if (!Array.prototype.find) {
   Array.prototype.find = function(predicate) {
     for (var i = 0; i < this.length; i++) {
@@ -618,7 +615,6 @@ var diniRaw = [
   { name: 'Kanal 21', url: 'https://karwan.tv/kanali-21', method:'iframe', color:'blue' },
   { name: 'Mihrab TV', url: 'https://karwan.tv/mihrab-tv', method:'iframe', color:'blue' },
 ];
-
 var sportRaw = [
   { name: 'MMN Sport', url: 'http://mmn.mypsx.net:1935/live/mmnhdsport/playlist.m3u8', color: 'green' },
   { name: 'Shna TV sport', url: 'https://karwan.tv/shna-tv-3/', method:'iframe', color:'green' },
@@ -626,7 +622,6 @@ var sportRaw = [
   { name: 'NRT sport', url: 'https://karwan.tv/nrt-sport/', method:'iframe', color:'green' },
   { name: 'Next TV', url: 'https://karwan.tv/next-tv/', method:'iframe', color:'green' },
 ];
-
 var karwanRaw = [
   { name: 'Znar TV', url: 'https://karwan.tv/znar-tv/', method:'iframe', color:'grey' },
   { name: 'Ronya tv', url: 'https://karwan.tv/ranya-city/', method:'iframe', color:'grey' },
@@ -641,9 +636,7 @@ var karwanRaw = [
   { name: 'Shna TV', url: 'https://karwan.tv/shna-tv', method:'iframe', color:'grey' },
   { name: 'TV Kurdi deng', url: 'https://karwan.tv/tv-kurdi/', method:'iframe', color:'grey' },
   { name: 'Kirkuk TV', url: 'https://karwan.tv/kirkuk-tv', method:'iframe', color:'beige', subgroup:'beige' },
-
 ];
-
 var RadioRaw = [
   { name: 'Rudaw Radio',   url: 'https://radio.rudaw.net/stream/live',                                    method:'audio', color:'cyan' },
   { name: 'Kurdsat Radio', url: 'http://uk3.internet-radio.com:8011/stream/',                               method:'audio', color:'cyan' },
@@ -683,9 +676,9 @@ function reorderCategory(cat, newArr) { channels[cat] = newArr; saveOrder(cat, n
 // ========== STATE ==========
 var hlsInst = null, dashInst = null, cur = null, favs = [], jsEnabled = true, tvMode = false, curFilter = null, curSub = 'all';
 var playMode = 'tv';
-
 try { favs = JSON.parse(localStorage.getItem('xomfavs') || '[]'); } catch(e) { favs = []; }
 try { var pm = localStorage.getItem('xom_playmode'); if (pm) playMode = pm; } catch(e) {}
+try { var jsT = localStorage.getItem('xom_js_toggle'); if (jsT === 'off') jsEnabled = false; } catch(e) {}
 
 function destroyPlayers() { if (hlsInst) { hlsInst.destroy(); hlsInst = null; } if (dashInst) { dashInst.reset(); dashInst = null; } }
 function reload() { if (cur) play(cur.url, cur.name, cur.method, cur.referer); }
@@ -711,7 +704,7 @@ function toggleJSengine() {
   btn.textContent = jsEnabled ? 'JS PA' : 'JS AV';
   btn.classList.toggle('js-toggle-off', !jsEnabled);
   if (cur) play(cur.url, cur.name, cur.method, cur.referer);
-  else document.getElementById('vwrap').innerHTML = '<div class="error-msg"><h3>JS ar nu ' + (jsEnabled ? 'AKTIVERAD' : 'AVSANGD') + '</h3><p>Välj en kanal igen.</p></div>';
+  else document.getElementById('vwrap').innerHTML = '<div class="error-msg"><h3>JS är nu ' + (jsEnabled ? 'AKTIVERAD' : 'AVSTÄNGD') + '</h3><p>Välj en kanal igen.</p></div>';
   localStorage.setItem('xom_js_toggle', jsEnabled ? 'on' : 'off');
 }
 function fav(url, name) {
@@ -727,7 +720,6 @@ function toggleList() { document.getElementById('channel-list').classList.toggle
 function isDirectStream(method) {
   return !method || method === 'hls' || method === 'hls-radio';
 }
-
 function setPlayMode(mode) {
   playMode = mode;
   localStorage.setItem('xom_playmode', mode);
@@ -735,36 +727,16 @@ function setPlayMode(mode) {
   document.getElementById('mode-audio').classList.toggle('active', mode === 'audio');
   if (cur) play(cur.url, cur.name, cur.method, cur.referer);
 }
-
 function showModeSwitcher(show) {
   var sw = document.getElementById('mode-switcher');
   sw.classList.toggle('visible', show);
 }
-
 function updateModeSwitcherUI() {
   document.getElementById('mode-tv').classList.toggle('active', playMode === 'tv');
   document.getElementById('mode-audio').classList.toggle('active', playMode === 'audio');
 }
 
-// ========== HEMLIG FLIK (för karwan.tv-länkar) ==========
-// Öppnar länken i en ny flik UTAN att skicka referrer/opener till karwan.tv,
-// så mottagarsidan inte kan se att den kom härifrån ("hemlig" flik).
-function openSecretTab(url) {
-  var w = window.open('', '_blank', 'noopener,noreferrer');
-  if (w) {
-    try {
-      w.opener = null;
-      w.location.href = url;
-    } catch (e) {
-      w.location = url;
-    }
-  } else {
-    // Popup-blockerare - fallback
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
-}
-
-// ========== AUDIO-ONLY PLAYER (för HLS i ljud-läge) ==========
+// ========== AUDIO-ONLY PLAYER ==========
 function renderAudioOnlyPlayer(url, name) {
   var wrap = document.getElementById('vwrap');
   wrap.innerHTML =
@@ -779,20 +751,15 @@ function renderAudioOnlyPlayer(url, name) {
         '<div class="audio-bar"></div>' +
       '</div>' +
       '<div class="audio-only-controls">' +
-        '<div class="audio-vol-wrap">' +
-          '&#128266; <input type="range" id="audioVolSlider" min="0" max="1" step="0.05" value="1">' +
-        '</div>' +
+        '<div class="audio-vol-wrap">&#128266; <input type="range" id="audioVolSlider" min="0" max="1" step="0.05" value="1"></div>' +
         '<div class="audio-info-badge" id="audioStatusBadge">Ansluter...</div>' +
       '</div>' +
       '<video id="vplayer" style="display:none;" autoplay></video>' +
     '</div>';
-
   var vid = document.getElementById('vplayer');
   var badge = document.getElementById('audioStatusBadge');
   var volSlider = document.getElementById('audioVolSlider');
-
   volSlider.addEventListener('input', function() { if (vid) vid.volume = parseFloat(volSlider.value); });
-
   if (typeof Hls !== 'undefined' && Hls.isSupported() && jsEnabled) {
     hlsInst = new Hls({ enableWorker: false });
     hlsInst.loadSource(url);
@@ -824,7 +791,7 @@ function render(filter, sub) {
     Object.keys(channels).forEach(function(k){ allCh = allCh.concat(channels[k]); });
     var favList = allCh.filter(function(ch){ return favs.some(function(f){ return f.url === ch.url; }); });
     if (favList.length === 0) {
-      html = '<div class="category-title">Favoriter</div><div class="error-msg" style="padding:20px;font-size:0.9rem;">Inga favoriter ännu.<br>Klicka pa en kanal för att lägga till.</div>';
+      html = '<div class="category-title">Favoriter</div><div class="error-msg" style="padding:20px;font-size:0.9rem;">Inga favoriter ännu.<br>Klicka på en kanal för att lägga till.</div>';
     } else {
       html = '<div class="category-title">Favoriter (' + favList.length + ')</div>' + favList.map(function(ch,i){ return row(ch,i,'__favs__'); }).join('');
     }
@@ -842,21 +809,18 @@ function render(filter, sub) {
   attachDragListeners();
   attachChannelEvents();
 }
-
 function row(ch, idx, catKey) {
   var m = ch.method || 'hls';
   var badge = '';
   if (m === 'iframe') badge = ' <span class="tag">live</span>';
   else if (m === 'audio') badge = ' <span class="tag">radio</span>';
   else badge = ' <span class="tag">hls</span>';
-  if (ch.url.indexOf('karwan.tv') !== -1) badge += ' <span class="tag">ny flik</span>';
   var isFav = favs.some(function(f){ return f.url === ch.url; });
   var star = isFav ? '&#9733;' : '&#9734;';
   var favClass = isFav ? 'fav-btn is-fav' : 'fav-btn';
   var activeClass = (cur && cur.url === ch.url) ? 'active' : '';
   return '<div class="channel-item ' + ch.color + ' ' + activeClass + '" draggable="true" data-url="' + escapeHtml(ch.url) + '" data-name="' + escapeHtml(ch.name) + '" data-method="' + m + '" data-referer="' + (ch.referer || '') + '" data-cat="' + catKey + '" data-idx="' + idx + '"><span>' + ch.name + badge + '</span><button class="' + favClass + '" onclick="event.stopPropagation();fav(\'' + escapeHtml(ch.url) + '\',\'' + escapeHtml(ch.name) + '\')">' + star + '</button></div>';
 }
-
 function escapeHtml(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -922,7 +886,6 @@ function cleanupDrag() {
   for (var i=0; i<items.length; i++) items[i].classList.remove('drag-over');
   dragSource = null;
 }
-
 function attachChannelEvents() {
   var items = document.querySelectorAll('.channel-item');
   for (var i=0; i<items.length; i++) {
@@ -933,7 +896,7 @@ function attachChannelEvents() {
   }
 }
 
-// ========== PLAY ==========
+// ========== PLAY - MODIFIERAD FÖR KARWAN.TV HEMLIG FLIK ==========
 function play(url, name, method, referer) {
   if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
   cur = { url: url, name: name, method: method, referer: referer };
@@ -941,11 +904,31 @@ function play(url, name, method, referer) {
   destroyPlayers();
   var wrap = document.getElementById('vwrap');
 
+  // === NYTT: Om det är karwan.tv OCH JS är PÅ -> öppna i hemlig flik, inte i spelaren ===
+  var isKarwan = url.indexOf('karwan.tv') !== -1;
+  if (isKarwan && jsEnabled) {
+    // Försök öppna i ny flik (hemlig flik = _blank, browser hanterar som ny tab)
+    var win = window.open(url, '_blank');
+    if (win) {
+      wrap.innerHTML = '<div class="error-msg" style="padding:50px 20px;">' +
+        '<h3 style="color:#4ecca3; font-size:1.5rem; margin-bottom:12px;">🔒 Öppnade i hemlig flik</h3>' +
+        '<p style="font-size:0.95rem; margin-bottom:8px;"><b>' + escapeHtml(name) + '</b> spelar nu i ny flik</p>' +
+        '<p style="font-size:0.82rem; opacity:0.7;">Stäng inte fliken om du vill fortsätta titta<br>JS är PÅ - kanalen blockeras från spelaren med flit</p>' +
+        '<button class="btn" style="margin-top:18px; padding:8px 20px;" onclick="window.open(\'' + escapeHtml(url) + '\', \'_blank\')">Öppna igen</button>' +
+        '</div>';
+    } else {
+      // Popup blocker
+      wrap.innerHTML = '<div class="error-msg"><h3>Popup blockerad</h3><p>Tillåt popup för denna sida, eller <a href="' + escapeHtml(url) + '" target="_blank" style="color:#4ecca3;">klicka här</a> för att öppna ' + escapeHtml(name) + '</p></div>';
+    }
+    render(curFilter, curSub);
+    return;
+  }
+
   var isDirect = isDirectStream(method);
   showModeSwitcher(isDirect);
   if (isDirect) updateModeSwitcherUI();
 
-  // ----- AUDIO (direkta radio-streams: MP3, AAC, Icecast) -----
+  // AUDIO
   if (method === 'audio') {
     if (!jsEnabled) {
       window.open(url, '_blank');
@@ -957,15 +940,8 @@ function play(url, name, method, referer) {
       '<div class="radio-player">' +
         '<div class="radio-icon">&#128251;</div>' +
         '<div class="radio-name">' + escapeHtml(name) + '</div>' +
-        '<div class="radio-visualizer">' +
-          '<div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div>' +
-          '<div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div>' +
-          '<div class="radio-bar"></div><div class="radio-bar"></div>' +
-        '</div>' +
-        '<audio id="vplayer" controls autoplay class="radio-audio">' +
-          '<source src="' + escapeHtml(url) + '">' +
-          'Din webbläsare stödjer inte audio.' +
-        '</audio>' +
+        '<div class="radio-visualizer"><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div><div class="radio-bar"></div></div>' +
+        '<audio id="vplayer" controls autoplay class="radio-audio"><source src="' + escapeHtml(url) + '">Din webbläsare stödjer inte audio.</audio>' +
         '<div class="radio-status">LIVE · RADIO STREAM</div>' +
       '</div>';
     var aud = document.getElementById('vplayer');
@@ -978,19 +954,11 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // ----- IFRAME -----
+  // IFRAME (icke-karwan.tv när JS PÅ)
   if (method === 'iframe') {
-    // Karwan.tv-kanaler öppnas alltid i en ny "hemlig" flik (utan referrer/opener)
-    // istället för att bäddas in i en iframe på sidan.
-    if (url.indexOf('karwan.tv') !== -1) {
-      openSecretTab(url);
-      wrap.innerHTML = '<div class="error-msg"><h3>' + escapeHtml(name) + ' öppnades i en ny hemlig flik</h3><p style="font-size:13px;margin-top:10px;">Fliken skickar ingen referrer- eller opener-information till karwan.tv.</p></div>';
-      render(curFilter, curSub);
-      return;
-    }
     if (!jsEnabled) {
       window.open(url, '_blank');
-      wrap.innerHTML = '<div class="error-msg"><h3>Öppnade i ny flik</h3></div>';
+      wrap.innerHTML = '<div class="error-msg"><h3>Öppnade i ny flik</h3><p>JS är AV</p></div>';
     } else {
       wrap.innerHTML = '<iframe src="' + escapeHtml(url) + '" allowfullscreen allow="autoplay; fullscreen" style="width:100%;height:100%;border:none;" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-presentation"></iframe>';
     }
@@ -998,14 +966,14 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // ----- HLS — LJUD-LÄGE -----
+  // HLS LJUD-LÄGE
   if (playMode === 'audio') {
     renderAudioOnlyPlayer(url, name);
     render(curFilter, curSub);
     return;
   }
 
-  // TV-läge (standard video)
+  // HLS VIDEO
   wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
   var vid = document.getElementById('vplayer');
   if (typeof Hls !== 'undefined' && Hls.isSupported() && jsEnabled) {
@@ -1158,7 +1126,7 @@ function initClock() {
   updateDigital(); drawAnalog();
 }
 
-// ========== DATUM — säker för gamla iOS ==========
+// ========== DATUM ==========
 function updateDateByCalendar() {
   var cal = document.getElementById('calendarSelect').value;
   var now = new Date();
@@ -1244,8 +1212,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   updateModeSwitcherUI();
+  // Sätt rätt text på JS-knapp vid start
+  var jsBtn = document.getElementById('jsToggleBtn');
+  jsBtn.textContent = jsEnabled ? 'JS PA' : 'JS AV';
+  jsBtn.classList.toggle('js-toggle-off', !jsEnabled);
 });
-
 render(null, 'all');
 </script>
 </body>
