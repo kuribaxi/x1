@@ -897,6 +897,63 @@ function attachChannelEvents() {
 }
 
 // ========== PLAY - MODIFIERAD FÖR KARWAN.TV HEMLIG FLIK ==========
+
+function isWebOS(){ return /Web0S|webOS|LG Browser|Large Screen/i.test(navigator.userAgent); }
+
+function playKarwanWebOS(url, name){
+  var bust = Date.now();
+  var cleanUrl = url + (url.indexOf('?')>-1 ? '&' : '?') + '_cf='+bust+'&webos=1';
+  var wrap = document.getElementById('vwrap');
+  wrap.innerHTML = 
+  '<div style="width:100%;height:100%;display:flex;flex-direction:column;background:#060f14">'+
+    '<div style="padding:10px;background:#0f212e;border-bottom:1px solid #4ecca3;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<div><b style="color:#4ecca3">'+escapeHtml(name)+'</b><div style="font-size:0.72rem;opacity:0.7;max-width:320px">LG TV: Om sidan loopar utan Cloudflare-ruta, tryck "Godkänn Cloudflare" för helskärm</div></div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        '<button class="btn" style="background:#4ecca3;color:#0a1c2a;font-weight:bold" onclick="window.open(\''+escapeHtml(url)+'\', \'_blank\')">↗ Ny flik</button>'+
+        '<button class="btn" style="background:#a855f7;color:white;font-weight:bold" onclick="approveCloudflareTop(\''+escapeHtml(url)+'\')">✅ Godkänn Cloudflare</button>'+
+        '<button class="btn" onclick="clearAndReload(\''+escapeHtml(url)+'\',\''+escapeHtml(name)+'\')">🧹 Rensa</button>'+
+      '</div>'+
+    '</div>'+
+    '<div style="flex:1;position:relative;background:#000" id="webos-wrap">'+
+      '<div id="webos-loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#4ecca3;background:rgba(0,0,0,0.85);padding:18px;border-radius:14px;z-index:2"><div class="spinner"></div><div style="margin-top:10px;font-size:0.85rem">Laddar '+escapeHtml(name)+'...<br><span style="font-size:0.7rem;opacity:0.7">Vänta på Cloudflare - klicka Jag är människa</span></div></div>'+
+      '<iframe id="webos-iframe" src="'+escapeHtml(cleanUrl)+'" allow="autoplay; fullscreen; encrypted-media" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-pointer-lock" style="width:100%;height:100%;border:none;background:#fff"></iframe>'+
+    '</div>'+
+  '</div>';
+  var iframe = document.getElementById('webos-iframe');
+  if(iframe){
+    iframe.onload = function(){
+      var l = document.getElementById('webos-loading');
+      if(l) l.style.display='none';
+      setTimeout(function(){
+        try{
+          var doc = iframe.contentDocument;
+          if(doc && doc.body && doc.body.innerHTML.length < 200){
+            var w = document.getElementById('webos-wrap');
+            if(w && !document.getElementById('loop-help')){
+              var d=document.createElement('div');
+              d.id='loop-help';
+              d.style.cssText='position:absolute;bottom:10px;left:10px;right:10px;background:#1a0f0f;border:1px solid #ff5555;border-radius:12px;padding:12px;text-align:center;z-index:10';
+              d.innerHTML='<div style="color:#ff9999;font-weight:bold;font-size:0.85rem">⚠️ Loop utan Cloudflare-ruta</div><div style="font-size:0.72rem;margin:6px 0">På LG TV måste du godkänna i helskärm</div><button class="btn" style="background:#a855f7;color:white" onclick="approveCloudflareTop(\''+escapeHtml(url)+'\')">✅ Öppna helskärm</button>';
+              w.appendChild(d);
+            }
+          }
+        }catch(e){ console.log('cross-origin ok'); }
+      }, 8000);
+    };
+  }
+  render(curFilter, curSub);
+}
+function approveCloudflareTop(url){
+  localStorage.setItem('karwan_pending_url', url);
+  if(confirm('TV:n går nu till karwan.tv för Cloudflare-godkännande.\n\n1. Klicka Jag är människa\n2. När kanalen startar, tryck TILLBAKA på fjärrkontrollen\n\nFortsätt?')){
+    window.location.href = url;
+  }
+}
+function clearAndReload(url, name){
+  try{ localStorage.clear(); sessionStorage.clear(); }catch(e){}
+  playKarwanWebOS(url + (url.indexOf('?')>-1?'&':'?')+'nocache='+Date.now(), name);
+}
+
 function play(url, name, method, referer) {
   if (window.innerWidth <= 768) document.getElementById('channel-list').classList.remove('show');
   cur = { url: url, name: name, method: method, referer: referer };
@@ -904,23 +961,10 @@ function play(url, name, method, referer) {
   destroyPlayers();
   var wrap = document.getElementById('vwrap');
 
-  // === NYTT: Om det är karwan.tv OCH JS är PÅ -> öppna i hemlig flik, inte i spelaren ===
   var isKarwan = url.indexOf('karwan.tv') !== -1;
+  // ===== LG webOS FIX: karwan.tv + JS PÅ = tvinga fram Cloudflare =====
   if (isKarwan && jsEnabled) {
-    // Försök öppna i ny flik (hemlig flik = _blank, browser hanterar som ny tab)
-    var win = window.open(url, '_blank');
-    if (win) {
-      wrap.innerHTML = '<div class="error-msg" style="padding:50px 20px;">' +
-        '<h3 style="color:#4ecca3; font-size:1.5rem; margin-bottom:12px;">🔒 Öppnade i hemlig flik</h3>' +
-        '<p style="font-size:0.95rem; margin-bottom:8px;"><b>' + escapeHtml(name) + '</b> spelar nu i ny flik</p>' +
-        '<p style="font-size:0.82rem; opacity:0.7;">Stäng inte fliken om du vill fortsätta titta<br>JS är PÅ - kanalen blockeras från spelaren med flit</p>' +
-        '<button class="btn" style="margin-top:18px; padding:8px 20px;" onclick="window.open(\'' + escapeHtml(url) + '\', \'_blank\')">Öppna igen</button>' +
-        '</div>';
-    } else {
-      // Popup blocker
-      wrap.innerHTML = '<div class="error-msg"><h3>Popup blockerad</h3><p>Tillåt popup för denna sida, eller <a href="' + escapeHtml(url) + '" target="_blank" style="color:#4ecca3;">klicka här</a> för att öppna ' + escapeHtml(name) + '</p></div>';
-    }
-    render(curFilter, curSub);
+    playKarwanWebOS(url, name);
     return;
   }
 
@@ -928,7 +972,6 @@ function play(url, name, method, referer) {
   showModeSwitcher(isDirect);
   if (isDirect) updateModeSwitcherUI();
 
-  // AUDIO
   if (method === 'audio') {
     if (!jsEnabled) {
       window.open(url, '_blank');
@@ -954,7 +997,6 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // IFRAME (icke-karwan.tv när JS PÅ)
   if (method === 'iframe') {
     if (!jsEnabled) {
       window.open(url, '_blank');
@@ -966,14 +1008,12 @@ function play(url, name, method, referer) {
     return;
   }
 
-  // HLS LJUD-LÄGE
   if (playMode === 'audio') {
     renderAudioOnlyPlayer(url, name);
     render(curFilter, curSub);
     return;
   }
 
-  // HLS VIDEO
   wrap.innerHTML = '<video id="vplayer" controls autoplay style="width:100%;height:100%;"></video>';
   var vid = document.getElementById('vplayer');
   if (typeof Hls !== 'undefined' && Hls.isSupported() && jsEnabled) {
@@ -998,6 +1038,7 @@ function play(url, name, method, referer) {
   render(curFilter, curSub);
 }
 
+// ========== FULLSCREEN NAV ==========
 // ========== FULLSCREEN NAV ==========
 function getAllChannels() {
   if (curFilter && channels[curFilter]) {
